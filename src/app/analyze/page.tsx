@@ -39,6 +39,10 @@ export default function AnalyzePage() {
   // 選択中セクションにフォーカス
   const [highlightSectionId, setHighlightSectionId] = useState<string | null>(null);
 
+  // 曲メモ
+  const [songMemoValue, setSongMemoValue] = useState<string>('');
+  const [isSavingMemo, setIsSavingMemo] = useState(false);
+
   const fetchSongs = async () => {
     const { data } = await supabase.from('songs').select('*').order('created_at', { ascending: false });
     if (data) setSongs(data);
@@ -56,12 +60,22 @@ export default function AnalyzePage() {
 
   const handleSelectSong = async (song: any) => {
     setSelectedSong(song);
+    setSongMemoValue(song.memo || '');
     const { data } = await supabase
       .from('song_sections')
       .select('*, phrase_highlights(*), song_section_tags(tags(*))')
       .eq('song_id', song.id)
       .order('sort_order', { ascending: true });
     if (data) setSections(data);
+  };
+
+  const handleSaveSongMemo = async (memo: string) => {
+    if (!selectedSong) return;
+    setIsSavingMemo(true);
+    await supabase.from('songs').update({ memo }).eq('id', selectedSong.id);
+    setSelectedSong((prev: any) => ({ ...prev, memo }));
+    setSongs(songs.map(s => s.id === selectedSong.id ? { ...s, memo } : s));
+    setTimeout(() => setIsSavingMemo(false), 600);
   };
 
   const handleSelectResult = async (result: SearchResult) => {
@@ -355,12 +369,30 @@ export default function AnalyzePage() {
         </div>
       ) : (
         <div className="p-8 max-w-4xl mx-auto w-full" onClick={() => setActiveDropdownId(null)}>
-          <div className="mb-8 border-b border-border pb-6">
-            <h1 className="text-4xl font-bold mb-3 text-primary">{selectedSong.title}</h1>
-            <div className="flex gap-3 text-sm text-secondary flex-wrap">
+          <div className="mb-6 border-b border-border pb-6">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 text-primary">{selectedSong.title}</h1>
+            <div className="flex gap-3 text-sm text-secondary flex-wrap mb-4">
               <span className="bg-surface px-3 py-1 border border-border flex items-center gap-1"><MicrophoneStage className="w-4 h-4" /> {selectedSong.artist}</span>
               {selectedSong.bpm && <span className="bg-surface px-3 py-1 border border-border">BPM: {selectedSong.bpm}</span>}
               {selectedSong.key && <span className="bg-surface px-3 py-1 border border-border">Key: {selectedSong.key}</span>}
+            </div>
+
+            {/* 曲全体メモ */}
+            <div className="bg-surface border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-bold text-secondary tracking-wider uppercase flex items-center gap-1">
+                  <Lightbulb className="w-3.5 h-3.5" /> 曲全体のメモ（Gemini分析など）
+                </label>
+                {isSavingMemo && <span className="text-[10px] text-[var(--color-accent-analyze)]">保存中...</span>}
+              </div>
+              <textarea
+                className="w-full bg-background border border-border p-3 text-sm text-primary focus:border-[var(--color-accent-analyze)] outline-none resize-none transition-colors"
+                rows={4}
+                placeholder="Geminiの分析結果や、曲全体の考察をここに残しておこう..."
+                value={songMemoValue}
+                onChange={(e) => setSongMemoValue(e.target.value)}
+                onBlur={(e) => handleSaveSongMemo(e.target.value)}
+              />
             </div>
           </div>
 
