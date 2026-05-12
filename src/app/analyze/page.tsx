@@ -467,6 +467,9 @@ export default function AnalyzePage() {
         minLeftPercent={18}
         maxLeftPercent={50}
         handleColor="var(--color-accent-analyze)"
+        mobileShowRight={!!selectedSong}
+        onMobileBack={() => setSelectedSong(null)}
+        mobileBackLabel="曲一覧"
       />
       <AddSongModal
         isOpen={isModalOpen}

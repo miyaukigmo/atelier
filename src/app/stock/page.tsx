@@ -126,7 +126,7 @@ export default function StockPage() {
       )}
 
       {/* メインエリア (グリッドビュー) */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
         {filteredStocks.length === 0 ? (
           <div className="flex items-center justify-center h-full text-secondary text-lg">
             {stocks.length === 0 

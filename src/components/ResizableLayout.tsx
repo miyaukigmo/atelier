@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { ArrowLeft } from '@phosphor-icons/react';
 
 interface ResizableLayoutProps {
   leftPanel: React.ReactNode;
@@ -8,6 +9,9 @@ interface ResizableLayoutProps {
   minLeftPercent?: number;
   maxLeftPercent?: number;
   handleColor?: string;
+  mobileShowRight?: boolean;
+  onMobileBack?: () => void;
+  mobileBackLabel?: string;
 }
 
 export default function ResizableLayout({
@@ -17,6 +21,9 @@ export default function ResizableLayout({
   minLeftPercent = 12,
   maxLeftPercent = 50,
   handleColor = 'var(--border)',
+  mobileShowRight = false,
+  onMobileBack,
+  mobileBackLabel = '戻る',
 }: ResizableLayoutProps) {
   const [leftPercent, setLeftPercent] = useState(defaultLeftPercent);
   const [isDragging, setIsDragging] = useState(false);
@@ -39,9 +46,7 @@ export default function ResizableLayout({
     [isDragging, minLeftPercent, maxLeftPercent]
   );
 
-  const onMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  const onMouseUp = useCallback(() => setIsDragging(false), []);
 
   useEffect(() => {
     if (isDragging) {
@@ -55,38 +60,53 @@ export default function ResizableLayout({
   }, [isDragging, onMouseMove, onMouseUp]);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex h-full w-full overflow-hidden"
-      style={{ userSelect: isDragging ? 'none' : 'auto' }}
-    >
-      {/* Left panel */}
-      <div
-        className="flex flex-col h-full overflow-hidden shrink-0"
-        style={{ width: `${leftPercent}%` }}
-      >
-        {leftPanel}
+    <>
+      {/* ===== MOBILE ===== */}
+      <div className="flex flex-col h-full w-full md:hidden overflow-hidden">
+        {mobileShowRight ? (
+          <div className="flex flex-col h-full w-full">
+            {onMobileBack && (
+              <div className="shrink-0 border-b border-border bg-surface px-4 py-3 flex items-center gap-2">
+                <button
+                  onClick={onMobileBack}
+                  className="flex items-center gap-1 text-sm text-secondary hover:text-primary transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {mobileBackLabel}
+                </button>
+              </div>
+            )}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
+              {rightPanel}
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+            {leftPanel}
+          </div>
+        )}
       </div>
 
-      {/* Resize handle */}
+      {/* ===== DESKTOP ===== */}
       <div
-        onMouseDown={onMouseDown}
-        className="shrink-0 w-1 h-full cursor-col-resize transition-colors"
-        style={{
-          backgroundColor: isDragging ? handleColor : 'var(--border)',
-          cursor: 'col-resize',
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = handleColor; }}
-        onMouseLeave={(e) => { if (!isDragging) e.currentTarget.style.backgroundColor = 'var(--border)'; }}
-      />
-
-      {/* Right panel */}
-      <div
-        className="flex flex-col h-full overflow-hidden"
-        style={{ width: `${100 - leftPercent}%` }}
+        ref={containerRef}
+        className="hidden md:flex h-full w-full overflow-hidden"
+        style={{ userSelect: isDragging ? 'none' : 'auto' }}
       >
-        {rightPanel}
+        <div className="flex flex-col h-full overflow-hidden shrink-0" style={{ width: `${leftPercent}%` }}>
+          {leftPanel}
+        </div>
+        <div
+          onMouseDown={onMouseDown}
+          className="shrink-0 w-1 h-full cursor-col-resize transition-colors"
+          style={{ backgroundColor: 'var(--border)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = handleColor; }}
+          onMouseLeave={(e) => { if (!isDragging) e.currentTarget.style.backgroundColor = 'var(--border)'; }}
+        />
+        <div className="flex flex-col h-full overflow-hidden" style={{ width: `${100 - leftPercent}%` }}>
+          {rightPanel}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

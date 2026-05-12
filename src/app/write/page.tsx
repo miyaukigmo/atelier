@@ -253,6 +253,9 @@ export default function WritePage() {
         minLeftPercent={12}
         maxLeftPercent={45}
         handleColor="var(--color-accent-write)"
+        mobileShowRight={!!activeDraft}
+        onMobileBack={() => setActiveDraft(null)}
+        mobileBackLabel="ドラフト一覧"
       />
 
       {/* 右からスライドインするStockパレット */}
