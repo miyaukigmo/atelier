@@ -1,0 +1,171 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/utils/supabase/client';
+import StockPalette from '@/components/StockPalette';
+
+export default function WritePage() {
+  const [drafts, setDrafts] = useState<any[]>([]);
+  const [activeDraft, setActiveDraft] = useState<any>(null);
+  const [sections, setSections] = useState<any[]>([]);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    fetchDrafts();
+    
+    // パレット用のショートカットキー (Ctrl+K or Cmd+K)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const fetchDrafts = async () => {
+    const { data } = await supabase.from('drafts').select('*').order('updated_at', { ascending: false });
+    if (data) setDrafts(data);
+  };
+
+  const handleCreateDraft = async () => {
+    const { data } = await supabase.from('drafts').insert([{ title: '無題のドラフト' }]).select().single();
+    if (data) {
+      setDrafts([data, ...drafts]);
+      handleSelectDraft(data);
+    }
+  };
+
+  const handleSelectDraft = async (draft: any) => {
+    setActiveDraft(draft);
+    const { data } = await supabase.from('draft_sections').select('*').eq('draft_id', draft.id).order('sort_order', { ascending: true });
+    if (data) setSections(data);
+  };
+
+  const handleUpdateDraftTitle = async (title: string) => {
+    setActiveDraft({ ...activeDraft, title });
+    await supabase.from('drafts').update({ title, updated_at: new Date() }).eq('id', activeDraft.id);
+    setDrafts(drafts.map(d => d.id === activeDraft.id ? { ...d, title } : d));
+  };
+
+  const handleAddSection = async () => {
+    if (!activeDraft) return;
+    const newOrder = sections.length;
+    const { data } = await supabase.from('draft_sections').insert([{
+      draft_id: activeDraft.id,
+      section_name: '新しいセクション',
+      sort_order: newOrder,
+      main_content: '',
+      sub_content: ''
+    }]).select().single();
+    
+    if (data) setSections([...sections, data]);
+  };
+
+  const handleUpdateSection = async (id: string, field: string, value: string) => {
+    setSections(sections.map(s => s.id === id ? { ...s, [field]: value } : s));
+    await supabase.from('draft_sections').update({ [field]: value }).eq('id', id);
+  };
+
+  return (
+    <div className="flex h-full w-full bg-background relative overflow-hidden">
+      {/* 左ペイン: ドラフト一覧 */}
+      <div className="w-[20%] min-w-[200px] border-r border-border bg-surface flex flex-col shrink-0">
+        <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center">
+          <span>📝 制作中の曲</span>
+          <button onClick={handleCreateDraft} className="text-secondary hover:text-primary px-2 bg-background border border-border rounded transition-colors">+</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          {drafts.map(draft => (
+            <div 
+              key={draft.id} 
+              onClick={() => handleSelectDraft(draft)}
+              className={`p-3 border rounded-md cursor-pointer transition-colors text-sm ${activeDraft?.id === draft.id ? 'bg-accent border-accent text-primary' : 'bg-background border-border text-secondary hover:border-accent'}`}
+            >
+              {draft.title}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 右ペイン: エディタ */}
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        {!activeDraft ? (
+          <div className="flex-1 flex items-center justify-center text-secondary text-lg">
+            👈 左からドラフトを選ぶか、新しく作ってね！
+          </div>
+        ) : (
+          <div className="p-8 max-w-5xl mx-auto w-full pb-32">
+            {/* ヘッダー: タイトル */}
+            <div className="mb-8 border-b border-border pb-4 flex justify-between items-end">
+              <input 
+                type="text" 
+                value={activeDraft.title}
+                onChange={(e) => handleUpdateDraftTitle(e.target.value)}
+                className="text-4xl font-bold bg-transparent text-primary focus:outline-none border-b border-transparent focus:border-border w-2/3 transition-colors"
+                placeholder="仮タイトル..."
+              />
+              <button 
+                onClick={() => setIsPaletteOpen(true)}
+                className="bg-accent border border-border text-primary px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm font-bold flex items-center gap-2"
+              >
+                💡 Stockを検索 (Cmd+K)
+              </button>
+            </div>
+
+            {/* セクション群 */}
+            <div className="space-y-8">
+              {sections.map(section => (
+                <div key={section.id} className="bg-surface border border-border rounded-lg p-6 shadow-sm">
+                  <div className="mb-4">
+                    <input 
+                      type="text" 
+                      value={section.section_name}
+                      onChange={(e) => handleUpdateSection(section.id, 'section_name', e.target.value)}
+                      className="font-bold text-lg text-primary bg-background border border-border px-3 py-1 rounded focus:outline-none focus:border-accent transition-colors"
+                      placeholder="セクション名 (Aメロなど)"
+                    />
+                  </div>
+                  
+                  {/* 2ペイン (メイン & サブ) */}
+                  <div className="grid grid-cols-2 gap-6 h-64">
+                    <div className="flex flex-col h-full">
+                      <label className="text-xs text-secondary mb-2 uppercase font-bold tracking-wider">✍️ メイン枠（歌詞）</label>
+                      <textarea 
+                        value={section.main_content || ''}
+                        onChange={(e) => handleUpdateSection(section.id, 'main_content', e.target.value)}
+                        className="flex-1 bg-background border border-border rounded-lg p-4 text-primary focus:outline-none focus:border-accent resize-none font-sans leading-relaxed text-lg transition-colors"
+                        placeholder="ここに組み上がってきた歌詞を書く..."
+                      />
+                    </div>
+                    <div className="flex flex-col h-full">
+                      <label className="text-xs text-secondary mb-2 uppercase font-bold tracking-wider opacity-70">💭 サブ枠（アイデアプール）</label>
+                      <textarea 
+                        value={section.sub_content || ''}
+                        onChange={(e) => handleUpdateSection(section.id, 'sub_content', e.target.value)}
+                        className="flex-1 bg-background border border-border rounded-lg p-4 text-secondary focus:outline-none focus:border-accent resize-none font-sans leading-relaxed opacity-80 transition-colors text-sm"
+                        placeholder="使いたい言葉の断片やイメージを置いておく..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8">
+              <button 
+                onClick={handleAddSection}
+                className="w-full border border-dashed border-border bg-surface text-secondary py-4 rounded-lg hover:border-accent hover:text-primary transition-colors font-bold"
+              >
+                + セクションを追加
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 右からスライドインするStockパレット */}
+      <StockPalette isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />
+    </div>
+  );
+}
