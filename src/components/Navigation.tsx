@@ -13,9 +13,8 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="w-20 md:w-64 h-full border-r border-border bg-surface flex flex-col py-6 px-4 shrink-0">
-      <div className="font-bold text-2xl mb-12 hidden md:block text-primary tracking-wider">RE:ME</div>
-      <div className="font-bold text-2xl mb-12 block md:hidden text-center text-primary tracking-wider">R</div>
+    <nav className="w-full h-full bg-surface flex flex-col py-6 px-4">
+      <div className="font-bold text-2xl mb-12 text-primary tracking-wider overflow-hidden whitespace-nowrap text-ellipsis">RE:ME</div>
       
       <ul className="space-y-2 flex-1">
         {navItems.map((item) => {
@@ -32,7 +31,7 @@ export default function Navigation() {
                 }`}
               >
                 <Icon weight={isActive ? "fill" : "duotone"} className="w-5 h-5 shrink-0" />
-                <span className="hidden md:inline">{item.name}</span>
+                <span className="truncate whitespace-nowrap">{item.name}</span>
               </Link>
             </li>
           );
@@ -48,7 +47,7 @@ export default function Navigation() {
           }`}
         >
           <Gear weight={pathname?.startsWith('/settings') ? "fill" : "duotone"} className="w-5 h-5 shrink-0" />
-          <span className="hidden md:inline">Settings</span>
+          <span className="truncate whitespace-nowrap">Settings</span>
         </Link>
       </div>
     </nav>

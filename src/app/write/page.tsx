@@ -130,9 +130,9 @@ export default function WritePage() {
             <div 
               key={draft.id} 
               onClick={() => handleSelectDraft(draft)}
-              className={`p-3 border cursor-pointer transition-colors text-sm flex justify-between items-center group ${activeDraft?.id === draft.id ? 'bg-[rgba(0,229,255,0.05)] border-[var(--color-accent-write)] text-[var(--color-accent-write)]' : 'bg-background border-border text-secondary hover:border-[var(--color-accent-write)]'}`}
+              className={`p-3 border cursor-pointer transition-colors text-sm flex justify-between items-center group overflow-hidden ${activeDraft?.id === draft.id ? 'bg-[rgba(0,229,255,0.05)] border-[var(--color-accent-write)] text-[var(--color-accent-write)]' : 'bg-background border-border text-secondary hover:border-[var(--color-accent-write)]'}`}
             >
-              <span className="truncate pr-2">{draft.title}</span>
+              <span className="truncate pr-2 whitespace-nowrap">{draft.title}</span>
               <button 
                 onClick={(e) => handleDeleteDraft(draft.id, e)}
                 className={`hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}

@@ -171,10 +171,10 @@ export default function AnalyzePage() {
               <div 
                 key={song.id} 
                 onClick={() => handleSelectSong(song)}
-                className={`p-3 border cursor-pointer transition-colors ${selectedSong?.id === song.id ? 'border-[var(--color-accent-analyze)] bg-[rgba(0,255,65,0.05)]' : 'border-border bg-background hover:border-[var(--color-accent-analyze)]'}`}
+                className={`p-3 border cursor-pointer transition-colors overflow-hidden ${selectedSong?.id === song.id ? 'border-[var(--color-accent-analyze)] bg-[rgba(0,255,65,0.05)]' : 'border-border bg-background hover:border-[var(--color-accent-analyze)]'}`}
               >
-                <div className={`font-bold ${selectedSong?.id === song.id ? 'text-[var(--color-accent-analyze)]' : 'text-primary'}`}>{song.title}</div>
-                <div className="text-sm text-secondary">{song.artist}</div>
+                <div className={`font-bold truncate whitespace-nowrap ${selectedSong?.id === song.id ? 'text-[var(--color-accent-analyze)]' : 'text-primary'}`}>{song.title}</div>
+                <div className="text-sm text-secondary truncate whitespace-nowrap">{song.artist}</div>
               </div>
             ))
           )}

@@ -6,7 +6,7 @@ export default function ClientPanelLayout({ children }: { children: React.ReactN
   return (
     <Group orientation="horizontal" className="h-full w-full overflow-hidden flex">
       {/* Navigation Panel */}
-      <Panel defaultSize={15} minSize={10} maxSize={25} className="shrink-0 flex flex-col h-full bg-surface border-r border-border">
+      <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col h-full bg-surface border-r border-border">
         <Navigation />
       </Panel>
 
