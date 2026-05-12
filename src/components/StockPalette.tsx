@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
+import { LightbulbIcon } from './icons';
 
 export default function StockPalette({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [stocks, setStocks] = useState<any[]>([]);
@@ -26,7 +27,7 @@ export default function StockPalette({ isOpen, onClose }: { isOpen: boolean, onC
   return (
     <div className="absolute inset-y-0 right-0 w-80 bg-surface border-l border-border shadow-2xl z-50 flex flex-col transform transition-transform">
       <div className="p-4 border-b border-border flex justify-between items-center bg-background">
-        <h3 className="font-bold text-primary">💡 Stock パレット</h3>
+        <h3 className="font-bold text-primary flex items-center gap-2"><LightbulbIcon className="w-5 h-5" /> Stock パレット</h3>
         <button onClick={onClose} className="text-secondary hover:text-primary text-2xl leading-none">&times;</button>
       </div>
       <div className="p-4 border-b border-border bg-surface shrink-0">

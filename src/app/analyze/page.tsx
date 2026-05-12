@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import AddSongModal from '@/components/AddSongModal';
+import { ArrowLeftIcon, MicIcon, EditIcon, LightbulbIcon, StarIcon, StarOutlineIcon } from '@/components/icons';
 
 export default function AnalyzePage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -151,8 +152,8 @@ export default function AnalyzePage() {
       {/* 右ペイン (70%) */}
       <div className="flex-1 bg-background flex flex-col overflow-y-auto relative">
         {!selectedSong ? (
-          <div className="flex-1 flex items-center justify-center text-secondary text-lg">
-            👈 左から曲を選ぶか、新しく登録してね！
+          <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
+            <ArrowLeftIcon className="w-6 h-6" /> 左から曲を選ぶか、新しく登録してね！
           </div>
         ) : (
           <div className="p-8 max-w-4xl mx-auto w-full">
@@ -160,7 +161,7 @@ export default function AnalyzePage() {
             <div className="mb-8 border-b border-border pb-6">
               <h1 className="text-4xl font-bold mb-3 text-primary">{selectedSong.title}</h1>
               <div className="flex gap-3 text-sm text-secondary">
-                <span className="bg-surface px-3 py-1 rounded-full border border-border">🎤 {selectedSong.artist}</span>
+                <span className="bg-surface px-3 py-1 rounded-full border border-border flex items-center gap-1"><MicIcon className="w-4 h-4" /> {selectedSong.artist}</span>
                 {selectedSong.bpm && <span className="bg-surface px-3 py-1 rounded-full border border-border">BPM: {selectedSong.bpm}</span>}
                 {selectedSong.key && <span className="bg-surface px-3 py-1 rounded-full border border-border">Key: {selectedSong.key}</span>}
               </div>
@@ -177,15 +178,15 @@ export default function AnalyzePage() {
                     <div className="space-x-2">
                       <button 
                         onClick={() => handleExtractPhrase(section)}
-                        className="text-xs bg-background border border-border px-3 py-1.5 rounded hover:bg-accent transition-colors text-primary font-bold"
+                        className="flex items-center gap-1 text-xs bg-background border border-border px-3 py-1.5 rounded hover:bg-accent transition-colors text-primary font-bold"
                       >
-                        🖊️ フレーズ抽出
+                        <EditIcon className="w-3 h-3" /> フレーズ抽出
                       </button>
                       <button 
                         onClick={() => handleToggleFavorite(section.id, section.is_favorite)}
-                        className={`text-xs px-3 py-1.5 rounded border transition-colors ${section.is_favorite ? 'bg-primary text-background border-primary font-bold' : 'bg-background border-border text-secondary hover:bg-accent'}`}
+                        className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded border transition-colors ${section.is_favorite ? 'bg-primary text-background border-primary font-bold' : 'bg-background border-border text-secondary hover:bg-accent'}`}
                       >
-                        {section.is_favorite ? '★ お気に入り' : '☆ お気に入り'}
+                        {section.is_favorite ? <><StarIcon className="w-3 h-3" /> お気に入り</> : <><StarOutlineIcon className="w-3 h-3" /> お気に入り</>}
                       </button>
                     </div>
                   </div>
@@ -196,7 +197,7 @@ export default function AnalyzePage() {
                   </div>
 
                   <div className="border-t border-border pt-4">
-                    <label className="block text-xs text-secondary mb-2">💡 セクションメモ（考察・気付き）</label>
+                    <label className="flex items-center gap-1 text-xs text-secondary mb-2"><LightbulbIcon className="w-3 h-3" /> セクションメモ（考察・気付き）</label>
                     <textarea 
                       className="w-full bg-background border border-border rounded p-3 text-sm text-primary focus:border-accent outline-none resize-none"
                       rows={2}

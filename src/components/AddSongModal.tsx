@@ -62,7 +62,7 @@ export default function AddSongModal({ isOpen, onClose, onSuccess }: AddSongModa
       setTitle(''); setArtist(''); setBpm(''); setSongKey(''); setLyrics('');
     } catch (err) {
       console.error(err);
-      alert('登録に失敗しました💦');
+      alert('登録に失敗しました');
     } finally {
       setLoading(false);
     }

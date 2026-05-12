@@ -71,7 +71,7 @@ export default function StockPage() {
                 <div className="border-t border-border pt-3 mt-auto">
                   <textarea 
                     className="w-full text-sm bg-transparent border border-transparent hover:border-border focus:border-accent rounded p-2 text-secondary focus:text-primary focus:outline-none resize-none transition-colors"
-                    placeholder="📝 背景や意図をメモ..."
+                    placeholder="背景や意図をメモ..."
                     defaultValue={stock.memo || ''}
                     rows={2}
                     onBlur={(e) => handleUpdateMemo(stock.id, e.target.value, stock.memo)}
