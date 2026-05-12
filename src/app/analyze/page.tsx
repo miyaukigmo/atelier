@@ -42,6 +42,7 @@ export default function AnalyzePage() {
   // 曲メモ
   const [songMemoValue, setSongMemoValue] = useState<string>('');
   const [isSavingMemo, setIsSavingMemo] = useState(false);
+  const [isMemoModalOpen, setIsMemoModalOpen] = useState(false);
 
   const fetchSongs = async () => {
     const { data } = await supabase.from('songs').select('*').order('created_at', { ascending: false });
@@ -377,23 +378,25 @@ export default function AnalyzePage() {
               {selectedSong.key && <span className="bg-surface px-3 py-1 border border-border">Key: {selectedSong.key}</span>}
             </div>
 
-            {/* 曲全体メモ */}
-            <div className="bg-surface border border-border p-4">
+            {/* 曲全体メモ — クリックでモーダル */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsMemoModalOpen(true); }}
+              className="w-full text-left bg-surface border border-border p-4 hover:border-[var(--color-accent-analyze)] transition-colors group"
+            >
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-secondary tracking-wider uppercase flex items-center gap-1">
-                  <Lightbulb className="w-3.5 h-3.5" /> 曲全体のメモ（Gemini分析など）
-                </label>
-                {isSavingMemo && <span className="text-[10px] text-[var(--color-accent-analyze)]">保存中...</span>}
+                <span className="text-xs font-bold text-secondary tracking-wider uppercase flex items-center gap-1">
+                  <Lightbulb className="w-3.5 h-3.5" /> 曲全体のメモ
+                </span>
+                <span className="text-[10px] text-secondary group-hover:text-[var(--color-accent-analyze)] transition-colors">
+                  {songMemoValue ? 'クリックして編集' : 'クリックして記録'} ↗
+                </span>
               </div>
-              <textarea
-                className="w-full bg-background border border-border p-3 text-sm text-primary focus:border-[var(--color-accent-analyze)] outline-none resize-none transition-colors"
-                rows={4}
-                placeholder="Geminiの分析結果や、曲全体の考察をここに残しておこう..."
-                value={songMemoValue}
-                onChange={(e) => setSongMemoValue(e.target.value)}
-                onBlur={(e) => handleSaveSongMemo(e.target.value)}
-              />
-            </div>
+              {songMemoValue ? (
+                <p className="text-sm text-primary leading-relaxed line-clamp-2 whitespace-pre-wrap">{songMemoValue}</p>
+              ) : (
+                <p className="text-sm text-secondary/50">Geminiの分析結果や、曲全体の考察をここに残しておこう...</p>
+              )}
+            </button>
           </div>
 
           <div className="space-y-6 pb-20">
@@ -508,6 +511,65 @@ export default function AnalyzePage() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => { fetchSongs(); }}
       />
+
+      {/* ===== 曲全体メモ モーダル ===== */}
+      {isMemoModalOpen && selectedSong && (
+        <div
+          className="fixed inset-0 bg-[#1c1917]/80 z-50 flex items-center justify-center p-4 md:p-10"
+          onClick={() => { handleSaveSongMemo(songMemoValue); setIsMemoModalOpen(false); }}
+        >
+          <div
+            className="bg-surface border border-border w-full max-w-3xl flex flex-col"
+            style={{ maxHeight: '85vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* モーダルヘッダー */}
+            <div className="px-5 py-4 border-b border-border shrink-0 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-[var(--color-accent-analyze)]" />
+                  <span className="font-bold text-primary">{selectedSong.title}</span>
+                  <span className="text-secondary text-sm">- 曲全体のメモ</span>
+                </div>
+                <p className="text-xs text-secondary mt-0.5">フォーカスを外すか閉じるボタンで自動保存</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {isSavingMemo && <span className="text-xs text-[var(--color-accent-analyze)]">保存中...</span>}
+                <button
+                  onClick={() => { handleSaveSongMemo(songMemoValue); setIsMemoModalOpen(false); }}
+                  className="text-secondary hover:text-primary text-xl leading-none px-2"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* テキストエリア — 内容に応じて伸びる */}
+            <div className="flex-1 overflow-y-auto p-5">
+              <textarea
+                autoFocus
+                className="w-full h-full min-h-[300px] bg-background border border-border p-4 text-sm text-primary focus:border-[var(--color-accent-analyze)] outline-none transition-colors leading-relaxed resize-none"
+                style={{ height: Math.max(300, (songMemoValue.split('\n').length + 2) * 24) }}
+                placeholder="Geminiの分析結果や、曲全体の考察をここに残しておこう...&#10;&#10;例）&#10;・サビの転調がCメジャー→Aマイナーで感情の揺らぎを表現&#10;・2番のBメロで使われた擬音が印象的"
+                value={songMemoValue}
+                onChange={(e) => setSongMemoValue(e.target.value)}
+                onBlur={(e) => handleSaveSongMemo(e.target.value)}
+              />
+            </div>
+
+            {/* フッター */}
+            <div className="px-5 py-3 border-t border-border shrink-0 flex justify-between items-center">
+              <span className="text-xs text-secondary">{songMemoValue.length} 文字</span>
+              <button
+                onClick={() => { handleSaveSongMemo(songMemoValue); setIsMemoModalOpen(false); }}
+                className="bg-[var(--color-accent-analyze)] text-[#1c1917] px-5 py-2 text-sm font-bold hover:opacity-90 transition-opacity"
+              >
+                保存して閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
