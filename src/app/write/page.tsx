@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import StockPalette from '@/components/StockPalette';
 import { Pen, ArrowLeft, Lightbulb, ChatCircle, Trash, CaretUp, CaretDown, Plus } from '@phosphor-icons/react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, Group, Separator } from 'react-resizable-panels';
 
 export default function WritePage() {
   const [drafts, setDrafts] = useState<any[]>([]);
@@ -118,7 +118,7 @@ export default function WritePage() {
 
   return (
     <div className="flex h-full w-full bg-background relative overflow-hidden">
-      <PanelGroup direction="horizontal" className="h-full w-full">
+      <Group orientation="horizontal" className="h-full w-full">
         {/* 左ペイン: ドラフト一覧 */}
         <Panel defaultSize={20} minSize={15} maxSize={40} className="bg-surface flex flex-col h-full border-r border-border relative">
         <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center">
@@ -145,7 +145,7 @@ export default function WritePage() {
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1 bg-border hover:bg-[var(--color-accent-write)] transition-colors cursor-col-resize z-10 shrink-0" />
+      <Separator className="w-1 bg-border hover:bg-[var(--color-accent-write)] transition-colors cursor-col-resize z-10 shrink-0" />
 
       {/* 右ペイン: エディタ */}
       <Panel defaultSize={80} minSize={50} className="flex flex-col h-full relative">
@@ -247,7 +247,7 @@ export default function WritePage() {
         )}
         </div>
       </Panel>
-      </PanelGroup>
+      </Group>
 
       {/* 右からスライドインするStockパレット */}
       <StockPalette isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />

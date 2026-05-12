@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import AddSongModal from '@/components/AddSongModal';
 import { ArrowLeft, MicrophoneStage, HighlighterCircle, Lightbulb, Star, Plus } from '@phosphor-icons/react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, Group, Separator } from 'react-resizable-panels';
 
 export default function AnalyzePage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -148,7 +148,7 @@ export default function AnalyzePage() {
 
   return (
     <div className="flex h-full w-full" onClick={() => setActiveDropdownId(null)}>
-      <PanelGroup direction="horizontal" className="h-full w-full">
+      <Group orientation="horizontal" className="h-full w-full">
         {/* 左ペイン (30%) */}
         <Panel defaultSize={30} minSize={20} maxSize={50} className="bg-surface flex flex-col h-full border-r border-border relative">
         <div className="p-4 border-b border-border">
@@ -189,7 +189,7 @@ export default function AnalyzePage() {
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1 bg-border hover:bg-[var(--color-accent-analyze)] transition-colors cursor-col-resize z-10 shrink-0" />
+      <Separator className="w-1 bg-border hover:bg-[var(--color-accent-analyze)] transition-colors cursor-col-resize z-10 shrink-0" />
 
       {/* 右ペイン (70%) */}
       <Panel defaultSize={70} minSize={50} className="bg-background flex flex-col h-full relative">
@@ -307,7 +307,7 @@ export default function AnalyzePage() {
         )}
         </div>
       </Panel>
-      </PanelGroup>
+      </Group>
 
       <AddSongModal 
         isOpen={isModalOpen} 
