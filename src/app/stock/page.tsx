@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
+import { TrashIcon } from '@/components/icons';
 
 export default function StockPage() {
   const [stocks, setStocks] = useState<any[]>([]);
@@ -39,6 +40,18 @@ export default function StockPage() {
     if (memo === oldMemo) return;
     await supabase.from('stocks').update({ memo }).eq('id', id);
     setStocks(stocks.map(s => s.id === id ? { ...s, memo } : s));
+  };
+
+  const handleUpdatePhrase = async (id: string, phrase: string, oldPhrase: string) => {
+    if (!phrase.trim() || phrase === oldPhrase) return;
+    await supabase.from('stocks').update({ phrase: phrase.trim() }).eq('id', id);
+    setStocks(stocks.map(s => s.id === id ? { ...s, phrase: phrase.trim() } : s));
+  };
+
+  const handleDeleteStock = async (id: string) => {
+    if (!window.confirm('このアイデアを削除してもいい？（元には戻せないよ！）')) return;
+    await supabase.from('stocks').delete().eq('id', id);
+    setStocks(stocks.filter(s => s.id !== id));
   };
 
   const handleToggleStockTag = async (stockId: string, tagId: string, hasTag: boolean) => {
@@ -123,14 +136,30 @@ export default function StockPage() {
         ) : (
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
             {filteredStocks.map(stock => (
-              <div key={stock.id} className="relative bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors flex flex-col min-h-[200px] shadow-sm">
+              <div key={stock.id} className="relative bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors flex flex-col min-h-[200px] shadow-sm group">
+                
+                {/* 削除ボタン */}
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleDeleteStock(stock.id); }}
+                  className="absolute top-4 right-4 text-secondary hover:text-primary transition-opacity opacity-0 group-hover:opacity-100 z-10"
+                  title="削除"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+
                 {/* Inbox インジケーター */}
                 {stock.is_inbox && (
                   <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-accent rounded-l-xl" title="未分類 (Inbox)"></div>
                 )}
                 
-                <div className="font-bold text-xl text-primary mb-4 whitespace-pre-wrap flex-1">
-                  {stock.phrase}
+                <div className="mb-4 flex-1 pr-6">
+                  <textarea 
+                    className="w-full font-bold text-xl text-primary bg-transparent border border-transparent hover:border-border focus:border-accent rounded p-1 focus:outline-none resize-none transition-colors"
+                    defaultValue={stock.phrase}
+                    rows={Math.max(1, (stock.phrase.match(/\n/g) || []).length + 1)}
+                    onBlur={(e) => handleUpdatePhrase(stock.id, e.target.value, stock.phrase)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
                 
                 <div className="border-t border-border pt-3 mt-auto mb-3">

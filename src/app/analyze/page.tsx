@@ -9,6 +9,7 @@ export default function AnalyzePage() {
   const [selectedSong, setSelectedSong] = useState<any | null>(null);
   const [sections, setSections] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Tag management
   const [allTags, setAllTags] = useState<any[]>([]);
@@ -152,6 +153,8 @@ export default function AnalyzePage() {
           <input 
             type="text" 
             placeholder="曲を検索..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-primary focus:outline-none focus:border-accent"
           />
         </div>
@@ -159,7 +162,10 @@ export default function AnalyzePage() {
           {songs.length === 0 ? (
             <p className="text-secondary text-sm text-center mt-4">曲がまだないよ！</p>
           ) : (
-            songs.map(song => (
+            songs.filter(song => 
+              song.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+              song.artist?.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map(song => (
               <div 
                 key={song.id} 
                 onClick={() => handleSelectSong(song)}
