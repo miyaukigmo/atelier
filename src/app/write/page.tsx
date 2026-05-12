@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import StockPalette from '@/components/StockPalette';
 import { Pen, ArrowLeft, Lightbulb, ChatCircle, Trash, CaretUp, CaretDown, Plus } from '@phosphor-icons/react';
-import { Panel, Group, Separator } from 'react-resizable-panels';
+import ResizableLayout from '@/components/ResizableLayout';
 
 export default function WritePage() {
   const [drafts, setDrafts] = useState<any[]>([]);
@@ -116,40 +116,36 @@ export default function WritePage() {
     ]);
   };
 
-  return (
-    <div className="h-full w-full bg-background relative overflow-hidden">
-      <Group orientation="horizontal" className="h-full w-full">
-        {/* 左ペイン: ドラフト一覧 */}
-        <Panel defaultSize={20} minSize={15} maxSize={40} className="bg-surface flex flex-col h-full border-r border-border relative">
-        <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center">
-          <span className="flex items-center gap-2"><Pen className="w-4 h-4" /> 制作中の曲</span>
-          <button onClick={handleCreateDraft} className="text-secondary hover:text-[var(--color-accent-write)] px-2 border border-transparent hover:border-[var(--color-accent-write)] transition-colors"><Plus /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {drafts.map(draft => (
-            <div 
-              key={draft.id} 
-              onClick={() => handleSelectDraft(draft)}
-              className={`p-3 border cursor-pointer transition-colors text-sm flex justify-between items-center group overflow-hidden ${activeDraft?.id === draft.id ? 'bg-[rgba(0,229,255,0.05)] border-[var(--color-accent-write)] text-[var(--color-accent-write)]' : 'bg-background border-border text-secondary hover:border-[var(--color-accent-write)]'}`}
+  const leftPane = (
+    <div className="bg-surface flex flex-col h-full border-r border-border">
+      <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center shrink-0">
+        <span className="flex items-center gap-2"><Pen className="w-4 h-4" /> 制作中の曲</span>
+        <button onClick={handleCreateDraft} className="text-secondary hover:text-[var(--color-accent-write)] px-2 border border-transparent hover:border-[var(--color-accent-write)] transition-colors"><Plus /></button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        {drafts.map(draft => (
+          <div 
+            key={draft.id} 
+            onClick={() => handleSelectDraft(draft)}
+            className={`p-3 border cursor-pointer transition-colors text-sm flex justify-between items-center group overflow-hidden ${activeDraft?.id === draft.id ? 'bg-[rgba(0,229,255,0.05)] border-[var(--color-accent-write)] text-[var(--color-accent-write)]' : 'bg-background border-border text-secondary hover:border-[var(--color-accent-write)]'}`}
+          >
+            <span className="truncate pr-2 whitespace-nowrap">{draft.title}</span>
+            <button 
+              onClick={(e) => handleDeleteDraft(draft.id, e)}
+              className={`hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+              title="削除"
             >
-              <span className="truncate pr-2 whitespace-nowrap">{draft.title}</span>
-              <button 
-                onClick={(e) => handleDeleteDraft(draft.id, e)}
-                className={`hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                title="削除"
-              >
-                <Trash className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </Panel>
+              <Trash className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
-      <Separator className="w-1 bg-border hover:bg-[var(--color-accent-write)] transition-colors cursor-col-resize z-10 shrink-0" />
 
-      {/* 右ペイン: エディタ */}
-      <Panel defaultSize={80} minSize={50} className="flex flex-col h-full relative">
-        <div className="flex-1 overflow-y-auto flex flex-col h-full">
+  const rightPane = (
+    <div className="flex flex-col h-full overflow-hidden bg-background">
         {!activeDraft ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
             <ArrowLeft className="w-6 h-6" /> 左からドラフトを選ぶか、新しく作ってね！
@@ -245,9 +241,19 @@ export default function WritePage() {
             </div>
           </div>
         )}
-        </div>
-      </Panel>
-      </Group>
+    </div>
+  );
+
+  return (
+    <div className="h-full w-full bg-background relative overflow-hidden">
+      <ResizableLayout
+        leftPanel={leftPane}
+        rightPanel={rightPane}
+        defaultLeftPercent={22}
+        minLeftPercent={12}
+        maxLeftPercent={45}
+        handleColor="var(--color-accent-write)"
+      />
 
       {/* 右からスライドインするStockパレット */}
       <StockPalette isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />

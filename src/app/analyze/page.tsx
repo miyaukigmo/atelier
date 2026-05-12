@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import AddSongModal from '@/components/AddSongModal';
 import { ArrowLeft, MicrophoneStage, HighlighterCircle, Lightbulb, Star, Plus } from '@phosphor-icons/react';
-import { Panel, Group, Separator } from 'react-resizable-panels';
+import ResizableLayout from '@/components/ResizableLayout';
 
 export default function AnalyzePage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -146,54 +146,49 @@ export default function AnalyzePage() {
     return elements;
   };
 
-  return (
-    <div className="h-full w-full" onClick={() => setActiveDropdownId(null)}>
-      <Group orientation="horizontal" className="h-full w-full">
-        {/* 左ペイン (30%) */}
-        <Panel defaultSize={30} minSize={20} maxSize={50} className="bg-surface flex flex-col h-full border-r border-border relative">
-        <div className="p-4 border-b border-border">
-          <input 
-            type="text" 
-            placeholder="曲を検索..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-background border border-border px-3 py-2 text-primary focus:outline-none focus:border-[var(--color-accent-analyze)] transition-colors"
-          />
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {songs.length === 0 ? (
-            <p className="text-secondary text-sm text-center mt-4">曲がまだないよ！</p>
-          ) : (
-            songs.filter(song => 
-              song.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-              song.artist?.toLowerCase().includes(searchQuery.toLowerCase())
-            ).map(song => (
-              <div 
-                key={song.id} 
-                onClick={() => handleSelectSong(song)}
-                className={`p-3 border cursor-pointer transition-colors overflow-hidden ${selectedSong?.id === song.id ? 'border-[var(--color-accent-analyze)] bg-[rgba(0,255,65,0.05)]' : 'border-border bg-background hover:border-[var(--color-accent-analyze)]'}`}
-              >
-                <div className={`font-bold truncate whitespace-nowrap ${selectedSong?.id === song.id ? 'text-[var(--color-accent-analyze)]' : 'text-primary'}`}>{song.title}</div>
-                <div className="text-sm text-secondary truncate whitespace-nowrap">{song.artist}</div>
-              </div>
-            ))
-          )}
-        </div>
-        <div className="p-4 border-t border-border">
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-full border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] py-2 hover:bg-[var(--color-accent-analyze)] hover:text-[#1c1917] transition-colors font-bold flex items-center justify-center gap-2"
-          >
-            <Plus weight="bold" /> 新規曲を登録
-          </button>
-        </div>
-      </Panel>
+  const leftPane = (
+    <div className="bg-surface flex flex-col h-full border-r border-border">
+      <div className="p-4 border-b border-border">
+        <input 
+          type="text" 
+          placeholder="曲を検索..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-background border border-border px-3 py-2 text-primary focus:outline-none focus:border-[var(--color-accent-analyze)] transition-colors"
+        />
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        {songs.length === 0 ? (
+          <p className="text-secondary text-sm text-center mt-4">曲がまだないよ！</p>
+        ) : (
+          songs.filter(song => 
+            song.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            song.artist?.toLowerCase().includes(searchQuery.toLowerCase())
+          ).map(song => (
+            <div 
+              key={song.id} 
+              onClick={() => handleSelectSong(song)}
+              className={`p-3 border cursor-pointer transition-colors overflow-hidden ${selectedSong?.id === song.id ? 'border-[var(--color-accent-analyze)] bg-[rgba(0,255,65,0.05)]' : 'border-border bg-background hover:border-[var(--color-accent-analyze)]'}`}
+            >
+              <div className={`font-bold truncate whitespace-nowrap ${selectedSong?.id === song.id ? 'text-[var(--color-accent-analyze)]' : 'text-primary'}`}>{song.title}</div>
+              <div className="text-sm text-secondary truncate whitespace-nowrap">{song.artist}</div>
+            </div>
+          ))
+        )}
+      </div>
+      <div className="p-4 border-t border-border">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="w-full border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] py-2 hover:bg-[var(--color-accent-analyze)] hover:text-[#1c1917] transition-colors font-bold flex items-center justify-center gap-2"
+        >
+          <Plus weight="bold" /> 新規曲を登録
+        </button>
+      </div>
+    </div>
+  );
 
-      <Separator className="w-1 bg-border hover:bg-[var(--color-accent-analyze)] transition-colors cursor-col-resize z-10 shrink-0" />
-
-      {/* 右ペイン (70%) */}
-      <Panel defaultSize={70} minSize={50} className="bg-background flex flex-col h-full relative">
-        <div className="flex-1 overflow-y-auto flex flex-col h-full">
+  const rightPane = (
+    <div className="bg-background flex flex-col h-full overflow-y-auto">
         {!selectedSong ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
             <ArrowLeft className="w-6 h-6" /> 左から曲を選ぶか、新しく登録してね！
@@ -305,10 +300,19 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-        </div>
-      </Panel>
-      </Group>
+    </div>
+  );
 
+  return (
+    <div className="h-full w-full" onClick={() => setActiveDropdownId(null)}>
+      <ResizableLayout
+        leftPanel={leftPane}
+        rightPanel={rightPane}
+        defaultLeftPercent={28}
+        minLeftPercent={18}
+        maxLeftPercent={50}
+        handleColor="var(--color-accent-analyze)"
+      />
       <AddSongModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
