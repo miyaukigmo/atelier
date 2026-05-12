@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
-import { SettingsIcon, TagIcon } from '@/components/icons';
+import { Gear, Tag, X } from '@phosphor-icons/react';
 
 const INITIAL_TAGS = [
   { axis_category: 'Focus', name: '情景' },
@@ -70,20 +70,20 @@ export default function SettingsPage() {
     const axisTags = tags.filter(t => t.axis_category === axis);
 
     return (
-      <div className="bg-surface border border-border rounded-lg p-6 shadow-sm">
+      <div className="bg-surface border border-border p-6">
         <h3 className="font-bold text-xl text-primary mb-1">{title}</h3>
         <p className="text-sm text-secondary mb-4">{description}</p>
         
         <div className="flex flex-wrap gap-2 mb-4">
           {axisTags.map(tag => (
-            <div key={tag.id} className="group flex items-center bg-background border border-border rounded-full pl-3 pr-1 py-1 text-sm text-primary transition-colors hover:border-accent">
+            <div key={tag.id} className="group flex items-center bg-background border border-border pl-3 pr-1 py-1 text-sm text-primary transition-colors hover:border-primary">
               <span>{tag.name}</span>
               <button 
                 onClick={() => handleDeleteTag(tag.id)}
-                className="ml-2 w-5 h-5 flex items-center justify-center rounded-full text-secondary hover:bg-accent hover:text-primary transition-colors"
+                className="ml-2 flex items-center justify-center text-secondary hover:text-primary transition-colors"
                 title="削除"
               >
-                &times;
+                <X className="w-4 h-4" />
               </button>
             </div>
           ))}
@@ -97,12 +97,12 @@ export default function SettingsPage() {
             onChange={(e) => setNewTagNames(prev => ({ ...prev, [axis]: e.target.value }))}
             onKeyDown={(e) => { if(e.key === 'Enter') handleAddTag(axis) }}
             placeholder="新しいタグ名を入力..." 
-            className="flex-1 bg-background border border-border rounded px-3 py-2 text-sm text-primary focus:outline-none focus:border-accent"
+            className="flex-1 bg-background border border-border px-3 py-2 text-sm text-primary focus:outline-none focus:border-primary"
           />
           <button 
             onClick={() => handleAddTag(axis)}
             disabled={!newTagNames[axis]?.trim()}
-            className="bg-primary text-background font-bold px-4 py-2 rounded text-sm disabled:opacity-50 hover:opacity-90 transition-opacity"
+            className="border border-primary text-primary font-bold px-4 py-2 text-sm disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-primary hover:bg-primary hover:text-[#161616] transition-colors"
           >
             追加
           </button>
@@ -114,8 +114,8 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col h-full w-full bg-background">
       <div className="p-8 border-b border-border bg-surface shrink-0 flex items-center gap-3">
-        <SettingsIcon className="w-8 h-8 text-primary" />
-        <h1 className="text-3xl font-bold text-primary">Settings</h1>
+        <Gear weight="duotone" className="w-8 h-8 text-primary" />
+        <h1 className="text-3xl font-bold text-primary tracking-wider">SETTINGS</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto p-8">
@@ -123,16 +123,16 @@ export default function SettingsPage() {
           
           <div>
             <h2 className="text-2xl font-bold text-primary mb-2 flex items-center gap-2">
-              <TagIcon className="w-6 h-6" /> タグ管理 (Stock用)
+              <Tag weight="duotone" className="w-6 h-6" /> タグ管理 (Stock用)
             </h2>
             <p className="text-secondary mb-6">Stockタブでアイデアを分類するためのタグ軸を管理します。</p>
 
             {tags.length === 0 && (
-              <div className="bg-accent bg-opacity-20 border border-accent rounded-lg p-6 mb-8 text-center">
+              <div className="bg-surface border border-border p-6 mb-8 text-center">
                 <p className="text-primary font-bold mb-4">タグがまだ一つもないみたい！初期セットアップをする？</p>
                 <button 
                   onClick={handleSetupInitialTags}
-                  className="bg-primary text-background font-bold px-6 py-3 rounded hover:opacity-90 transition-opacity"
+                  className="border border-primary text-primary font-bold px-6 py-3 hover:bg-primary hover:text-[#161616] transition-colors"
                 >
                   初期タグをセットアップする
                 </button>

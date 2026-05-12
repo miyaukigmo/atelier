@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import StockPalette from '@/components/StockPalette';
-import { EditIcon, ArrowLeftIcon, LightbulbIcon, MessageIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
+import { Pen, ArrowLeft, Lightbulb, ChatCircle, Trash, CaretUp, CaretDown, Plus } from '@phosphor-icons/react';
 
 export default function WritePage() {
   const [drafts, setDrafts] = useState<any[]>([]);
@@ -120,23 +120,23 @@ export default function WritePage() {
       {/* 左ペイン: ドラフト一覧 */}
       <div className="w-[20%] min-w-[200px] border-r border-border bg-surface flex flex-col shrink-0">
         <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center">
-          <span className="flex items-center gap-2"><EditIcon className="w-4 h-4" /> 制作中の曲</span>
-          <button onClick={handleCreateDraft} className="text-secondary hover:text-primary px-2 bg-background border border-border rounded transition-colors">+</button>
+          <span className="flex items-center gap-2"><Pen className="w-4 h-4" /> 制作中の曲</span>
+          <button onClick={handleCreateDraft} className="text-secondary hover:text-[var(--color-accent-write)] px-2 border border-transparent hover:border-[var(--color-accent-write)] transition-colors"><Plus /></button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {drafts.map(draft => (
             <div 
               key={draft.id} 
               onClick={() => handleSelectDraft(draft)}
-              className={`p-3 border rounded-md cursor-pointer transition-colors text-sm flex justify-between items-center group ${activeDraft?.id === draft.id ? 'bg-accent border-accent text-primary' : 'bg-background border-border text-secondary hover:border-accent'}`}
+              className={`p-3 border cursor-pointer transition-colors text-sm flex justify-between items-center group ${activeDraft?.id === draft.id ? 'bg-[rgba(0,229,255,0.05)] border-[var(--color-accent-write)] text-[var(--color-accent-write)]' : 'bg-background border-border text-secondary hover:border-[var(--color-accent-write)]'}`}
             >
               <span className="truncate pr-2">{draft.title}</span>
               <button 
                 onClick={(e) => handleDeleteDraft(draft.id, e)}
-                className={`text-secondary hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                className={`hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 title="削除"
               >
-                <TrashIcon className="w-4 h-4" />
+                <Trash className="w-4 h-4" />
               </button>
             </div>
           ))}
@@ -147,7 +147,7 @@ export default function WritePage() {
       <div className="flex-1 flex flex-col overflow-y-auto">
         {!activeDraft ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
-            <ArrowLeftIcon className="w-6 h-6" /> 左からドラフトを選ぶか、新しく作ってね！
+            <ArrowLeft className="w-6 h-6" /> 左からドラフトを選ぶか、新しく作ってね！
           </div>
         ) : (
           <div className="p-8 max-w-5xl mx-auto w-full pb-32">
@@ -162,37 +162,37 @@ export default function WritePage() {
               />
               <button 
                 onClick={() => setIsPaletteOpen(true)}
-                className="bg-accent border border-border text-primary px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm font-bold flex items-center gap-2"
+                className="border border-[var(--color-accent-write)] text-[var(--color-accent-write)] px-4 py-2 hover:bg-[var(--color-accent-write)] hover:text-[#161616] transition-colors text-sm font-bold flex items-center gap-2"
               >
-                <LightbulbIcon className="w-4 h-4" /> Stockを検索 (Cmd+K)
+                <Lightbulb weight="fill" className="w-4 h-4" /> Stockを検索 (Cmd+K)
               </button>
             </div>
 
             {/* セクション群 */}
             <div className="space-y-8">
               {sections.map((section, index) => (
-                <div key={section.id} className="bg-surface border border-border rounded-lg p-6 shadow-sm relative group">
+                <div key={section.id} className="bg-surface border border-border p-6 relative group">
                   
                   {/* アクションボタン (右上) */}
                   <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-surface pl-2">
                     <button 
                       onClick={() => handleMoveSection(index, 'up')}
                       disabled={index === 0}
-                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 text-secondary hover:text-[var(--color-accent-write)] disabled:opacity-30 disabled:hover:text-secondary"
                       title="上に移動"
-                    ><ArrowUpIcon className="w-4 h-4" /></button>
+                    ><CaretUp className="w-5 h-5" /></button>
                     <button 
                       onClick={() => handleMoveSection(index, 'down')}
                       disabled={index === sections.length - 1}
-                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 text-secondary hover:text-[var(--color-accent-write)] disabled:opacity-30 disabled:hover:text-secondary"
                       title="下に移動"
-                    ><ArrowDownIcon className="w-4 h-4" /></button>
+                    ><CaretDown className="w-5 h-5" /></button>
                     <div className="w-px h-4 bg-border mx-1"></div>
                     <button 
                       onClick={() => handleDeleteSection(section.id)}
-                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded"
+                      className="p-1.5 text-secondary hover:text-primary"
                       title="セクションを削除"
-                    ><TrashIcon className="w-4 h-4" /></button>
+                    ><Trash className="w-4 h-4" /></button>
                   </div>
 
                   <div className="mb-4 pr-32">
@@ -200,7 +200,7 @@ export default function WritePage() {
                       type="text" 
                       value={section.section_name}
                       onChange={(e) => handleUpdateSection(section.id, 'section_name', e.target.value)}
-                      className="font-bold text-lg text-primary bg-background border border-border px-3 py-1 rounded focus:outline-none focus:border-accent transition-colors"
+                      className="font-bold text-lg text-primary bg-background border border-border px-3 py-1 focus:outline-none focus:border-[var(--color-accent-write)] transition-colors"
                       placeholder="セクション名 (Aメロなど)"
                     />
                   </div>
@@ -208,20 +208,20 @@ export default function WritePage() {
                   {/* 2ペイン (メイン & サブ) */}
                   <div className="grid grid-cols-2 gap-6 h-64">
                     <div className="flex flex-col h-full">
-                      <label className="flex items-center gap-1.5 text-xs text-secondary mb-2 uppercase font-bold tracking-wider"><EditIcon className="w-3 h-3" /> メイン枠（歌詞）</label>
+                      <label className="flex items-center gap-1.5 text-xs text-secondary mb-2 uppercase font-bold tracking-wider"><Pen className="w-3 h-3" /> メイン枠（歌詞）</label>
                       <textarea 
                         value={section.main_content || ''}
                         onChange={(e) => handleUpdateSection(section.id, 'main_content', e.target.value)}
-                        className="flex-1 bg-background border border-border rounded-lg p-4 text-primary focus:outline-none focus:border-accent resize-none font-sans leading-relaxed text-lg transition-colors"
+                        className="flex-1 bg-background border border-border p-4 text-primary focus:outline-none focus:border-[var(--color-accent-write)] resize-none font-sans leading-relaxed text-lg transition-colors"
                         placeholder="ここに組み上がってきた歌詞を書く..."
                       />
                     </div>
                     <div className="flex flex-col h-full">
-                      <label className="flex items-center gap-1.5 text-xs text-secondary mb-2 uppercase font-bold tracking-wider opacity-70"><MessageIcon className="w-3 h-3" /> サブ枠（アイデアプール）</label>
+                      <label className="flex items-center gap-1.5 text-xs text-secondary mb-2 uppercase font-bold tracking-wider opacity-70"><ChatCircle className="w-3 h-3" /> サブ枠（アイデアプール）</label>
                       <textarea 
                         value={section.sub_content || ''}
                         onChange={(e) => handleUpdateSection(section.id, 'sub_content', e.target.value)}
-                        className="flex-1 bg-background border border-border rounded-lg p-4 text-secondary focus:outline-none focus:border-accent resize-none font-sans leading-relaxed opacity-80 transition-colors text-sm"
+                        className="flex-1 bg-background border border-border p-4 text-secondary focus:outline-none focus:border-[var(--color-accent-write)] resize-none font-sans leading-relaxed opacity-80 transition-colors text-sm"
                         placeholder="使いたい言葉の断片やイメージを置いておく..."
                       />
                     </div>
@@ -233,7 +233,7 @@ export default function WritePage() {
             <div className="mt-8">
               <button 
                 onClick={handleAddSection}
-                className="w-full border border-dashed border-border bg-surface text-secondary py-4 rounded-lg hover:border-accent hover:text-primary transition-colors font-bold"
+                className="w-full border border-dashed border-border bg-surface text-secondary py-4 hover:border-[var(--color-accent-write)] hover:text-primary transition-colors font-bold"
               >
                 + セクションを追加
               </button>

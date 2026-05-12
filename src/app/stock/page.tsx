@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
-import { TrashIcon } from '@/components/icons';
+import { Trash, Plus, X } from '@phosphor-icons/react';
 
 export default function StockPage() {
   const [stocks, setStocks] = useState<any[]>([]);
@@ -82,10 +82,10 @@ export default function StockPage() {
             value={phraseInput}
             onChange={(e) => setPhraseInput(e.target.value)}
             placeholder="ふと思いついたフレーズを入力してEnter（とりあえずInboxへ直行！）" 
-            className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-primary focus:outline-none focus:border-primary transition-colors text-lg"
+            className="flex-1 bg-background border border-border px-4 py-3 text-primary focus:outline-none focus:border-[var(--color-accent-stock)] transition-colors text-lg"
           />
-          <button type="submit" disabled={!phraseInput.trim()} className="bg-primary text-background font-bold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50">
-            + 追加
+          <button type="submit" disabled={!phraseInput.trim()} className="border border-[var(--color-accent-stock)] text-[var(--color-accent-stock)] font-bold px-8 py-3 hover:bg-[var(--color-accent-stock)] hover:text-[#161616] transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[var(--color-accent-stock)] flex items-center gap-2">
+            <Plus weight="bold" /> 追加
           </button>
         </form>
       </div>
@@ -107,7 +107,7 @@ export default function StockPage() {
                       setFilterTags([...filterTags, tag.id]);
                     }
                   }}
-                  className={`text-xs px-3 py-1.5 rounded-full border whitespace-nowrap transition-colors ${isActive ? 'bg-primary text-background border-primary font-bold shadow-sm' : 'bg-surface text-secondary border-border hover:border-accent'}`}
+                  className={`text-xs px-3 py-1.5 border whitespace-nowrap transition-colors ${isActive ? 'bg-[var(--color-accent-stock)] text-[#161616] border-[var(--color-accent-stock)] font-bold' : 'bg-surface text-secondary border-border hover:border-[var(--color-accent-stock)] hover:text-primary'}`}
                 >
                   {tag.name}
                 </button>
@@ -136,25 +136,25 @@ export default function StockPage() {
         ) : (
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
             {filteredStocks.map(stock => (
-              <div key={stock.id} className="relative bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors flex flex-col min-h-[200px] shadow-sm group">
+              <div key={stock.id} className="relative bg-surface border border-border p-6 hover:border-[var(--color-accent-stock)] transition-colors flex flex-col min-h-[200px] group">
                 
                 {/* 削除ボタン */}
                 <button 
                   onClick={(e) => { e.stopPropagation(); handleDeleteStock(stock.id); }}
-                  className="absolute top-4 right-4 text-secondary hover:text-primary transition-opacity opacity-0 group-hover:opacity-100 z-10"
+                  className="absolute top-4 right-4 text-secondary hover:text-[var(--color-accent-stock)] transition-opacity opacity-0 group-hover:opacity-100 z-10"
                   title="削除"
                 >
-                  <TrashIcon className="w-4 h-4" />
+                  <Trash className="w-5 h-5" />
                 </button>
 
                 {/* Inbox インジケーター */}
                 {stock.is_inbox && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-accent rounded-l-xl" title="未分類 (Inbox)"></div>
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--color-accent-stock)]" title="未分類 (Inbox)"></div>
                 )}
                 
                 <div className="mb-4 flex-1 pr-6">
                   <textarea 
-                    className="w-full font-bold text-xl text-primary bg-transparent border border-transparent hover:border-border focus:border-accent rounded p-1 focus:outline-none resize-none transition-colors"
+                    className="w-full font-bold text-xl text-primary bg-transparent border border-transparent hover:border-border focus:border-[var(--color-accent-stock)] p-1 focus:outline-none resize-none transition-colors"
                     defaultValue={stock.phrase}
                     rows={Math.max(1, (stock.phrase.match(/\n/g) || []).length + 1)}
                     onBlur={(e) => handleUpdatePhrase(stock.id, e.target.value, stock.phrase)}
@@ -164,7 +164,7 @@ export default function StockPage() {
                 
                 <div className="border-t border-border pt-3 mt-auto mb-3">
                   <textarea 
-                    className="w-full text-sm bg-transparent border border-transparent hover:border-border focus:border-accent rounded p-2 text-secondary focus:text-primary focus:outline-none resize-none transition-colors"
+                    className="w-full text-sm bg-transparent border border-transparent hover:border-border focus:border-[var(--color-accent-stock)] p-2 text-secondary focus:text-primary focus:outline-none resize-none transition-colors"
                     placeholder="背景や意図をメモ..."
                     defaultValue={stock.memo || ''}
                     rows={2}
@@ -174,24 +174,24 @@ export default function StockPage() {
                 
                 <div className="flex flex-wrap gap-2 items-center relative" onClick={(e) => e.stopPropagation()}>
                   {stock.stock_tags?.map((st: any) => (
-                    <span key={st.tags.id} className="group flex items-center text-xs bg-background border border-border text-secondary pl-2 pr-1 py-1 rounded transition-colors hover:border-accent">
+                    <span key={st.tags.id} className="group flex items-center text-xs bg-background border border-border text-secondary pl-2 pr-1 py-1 transition-colors">
                       {st.tags.name}
                       <button 
                         onClick={() => handleToggleStockTag(stock.id, st.tags.id, true)}
-                        className="ml-1 w-4 h-4 flex items-center justify-center rounded-full hover:bg-accent hover:text-primary"
-                      >&times;</button>
+                        className="ml-1 flex items-center justify-center hover:text-primary"
+                      ><X className="w-3 h-3"/></button>
                     </span>
                   ))}
                   <button 
                     onClick={() => setActiveDropdownId(activeDropdownId === stock.id ? null : stock.id)}
-                    className="text-xs text-secondary hover:text-primary px-2 py-1 transition-colors"
+                    className="text-xs text-secondary hover:text-primary px-2 py-1 transition-colors flex items-center gap-1"
                   >
-                    + タグを追加
+                    <Plus /> タグを追加
                   </button>
 
                   {/* タグ選択ドロップダウン */}
                   {activeDropdownId === stock.id && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-surface border border-border rounded-lg shadow-xl z-10 p-4 flex flex-col gap-4 max-h-[300px] overflow-y-auto">
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-surface border border-border z-10 p-4 flex flex-col gap-4 max-h-[300px] overflow-y-auto">
                       {['Focus', 'Gimmick', 'Context'].map(axis => {
                         const axisTags = allTags.filter(t => t.axis_category === axis);
                         if (axisTags.length === 0) return null;
@@ -205,7 +205,7 @@ export default function StockPage() {
                                   <button
                                     key={tag.id}
                                     onClick={() => handleToggleStockTag(stock.id, tag.id, hasTag)}
-                                    className={`text-xs px-2.5 py-1.5 rounded-full border transition-colors ${hasTag ? 'bg-primary text-background border-primary' : 'bg-background text-secondary border-border hover:border-accent hover:text-primary'}`}
+                                    className={`text-xs px-2.5 py-1.5 border transition-colors ${hasTag ? 'bg-[var(--color-accent-stock)] text-[#161616] border-[var(--color-accent-stock)] font-bold' : 'bg-background text-secondary border-border hover:border-[var(--color-accent-stock)] hover:text-primary'}`}
                                   >
                                     {tag.name}
                                   </button>

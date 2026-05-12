@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import { parseLyrics } from '@/utils/lyricsParser';
+import { X } from '@phosphor-icons/react';
 
 interface AddSongModalProps {
   isOpen: boolean;
@@ -69,41 +70,41 @@ export default function AddSongModal({ isOpen, onClose, onSuccess }: AddSongModa
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-surface border border-border w-full max-w-2xl rounded-lg shadow-xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-[#161616]/90 flex items-center justify-center z-50">
+      <div className="bg-surface border border-border w-full max-w-2xl flex flex-col max-h-[90vh]">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-primary">新規曲を登録</h2>
-          <button onClick={onClose} className="text-secondary hover:text-primary text-2xl leading-none">&times;</button>
+          <button onClick={onClose} className="text-secondary hover:text-primary"><X className="w-6 h-6" /></button>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-secondary mb-1">曲名 <span className="text-red-400">*</span></label>
-              <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-background border border-border rounded p-2 text-primary focus:border-accent outline-none" />
+              <label className="block text-sm text-secondary mb-1">曲名 <span className="text-[var(--color-accent-analyze)]">*</span></label>
+              <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-background border border-border p-2 text-primary focus:border-[var(--color-accent-analyze)] outline-none transition-colors" />
             </div>
             <div>
-              <label className="block text-sm text-secondary mb-1">アーティスト <span className="text-red-400">*</span></label>
-              <input type="text" required value={artist} onChange={e => setArtist(e.target.value)} className="w-full bg-background border border-border rounded p-2 text-primary focus:border-accent outline-none" />
+              <label className="block text-sm text-secondary mb-1">アーティスト <span className="text-[var(--color-accent-analyze)]">*</span></label>
+              <input type="text" required value={artist} onChange={e => setArtist(e.target.value)} className="w-full bg-background border border-border p-2 text-primary focus:border-[var(--color-accent-analyze)] outline-none transition-colors" />
             </div>
             <div>
               <label className="block text-sm text-secondary mb-1">BPM</label>
-              <input type="number" value={bpm} onChange={e => setBpm(e.target.value)} className="w-full bg-background border border-border rounded p-2 text-primary focus:border-accent outline-none" />
+              <input type="number" value={bpm} onChange={e => setBpm(e.target.value)} className="w-full bg-background border border-border p-2 text-primary focus:border-[var(--color-accent-analyze)] outline-none transition-colors" />
             </div>
             <div>
               <label className="block text-sm text-secondary mb-1">Key</label>
-              <input type="text" value={songKey} onChange={e => setSongKey(e.target.value)} className="w-full bg-background border border-border rounded p-2 text-primary focus:border-accent outline-none" />
+              <input type="text" value={songKey} onChange={e => setSongKey(e.target.value)} className="w-full bg-background border border-border p-2 text-primary focus:border-[var(--color-accent-analyze)] outline-none transition-colors" />
             </div>
           </div>
           
           <div>
-            <label className="block text-sm text-secondary mb-1">歌詞（[Aメロ]などのタグで自動分割されます） <span className="text-red-400">*</span></label>
-            <textarea required value={lyrics} onChange={e => setLyrics(e.target.value)} rows={12} className="w-full bg-background border border-border rounded p-2 text-primary focus:border-accent outline-none resize-none font-sans" placeholder="[Aメロ]&#10;ここに歌詞を入力..." />
+            <label className="block text-sm text-secondary mb-1">歌詞（[Aメロ]などのタグで自動分割されます） <span className="text-[var(--color-accent-analyze)]">*</span></label>
+            <textarea required value={lyrics} onChange={e => setLyrics(e.target.value)} rows={12} className="w-full bg-background border border-border p-2 text-primary focus:border-[var(--color-accent-analyze)] outline-none resize-none font-sans transition-colors" placeholder="[Aメロ]&#10;ここに歌詞を入力..." />
           </div>
 
-          <div className="flex justify-end pt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-secondary hover:text-primary mr-2">キャンセル</button>
-            <button type="submit" disabled={loading} className="bg-primary text-background px-6 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50">
+          <div className="flex justify-end pt-4 gap-4">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-secondary hover:text-primary transition-colors">キャンセル</button>
+            <button type="submit" disabled={loading} className="border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] px-6 py-2 font-bold hover:bg-[var(--color-accent-analyze)] hover:text-[#161616] disabled:opacity-30 disabled:hover:bg-transparent transition-colors">
               {loading ? '登録中...' : '登録する'}
             </button>
           </div>

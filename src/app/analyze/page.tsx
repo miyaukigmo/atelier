@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import AddSongModal from '@/components/AddSongModal';
-import { ArrowLeftIcon, MicIcon, EditIcon, LightbulbIcon, StarIcon, StarOutlineIcon } from '@/components/icons';
+import { ArrowLeft, MicrophoneStage, HighlighterCircle, Lightbulb, Star, Plus } from '@phosphor-icons/react';
 
 export default function AnalyzePage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -132,7 +132,7 @@ export default function AnalyzePage() {
         elements.push(text.slice(lastIndex, hl.start_index));
         // ハイライト部分
         elements.push(
-          <mark key={hl.id} className="bg-accent text-primary px-1 rounded mx-0.5 shadow-sm transition-colors cursor-pointer hover:bg-opacity-80" title="保存されたフレーズ">
+          <mark key={hl.id} className="bg-[var(--color-accent-analyze)] text-[#161616] px-1 mx-0.5 cursor-pointer hover:opacity-80" title="保存されたフレーズ">
             {text.slice(hl.start_index, hl.end_index)}
           </mark>
         );
@@ -155,7 +155,7 @@ export default function AnalyzePage() {
             placeholder="曲を検索..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-background border border-border rounded-md px-3 py-2 text-primary focus:outline-none focus:border-accent"
+            className="w-full bg-background border border-border px-3 py-2 text-primary focus:outline-none focus:border-[var(--color-accent-analyze)] transition-colors"
           />
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -169,9 +169,9 @@ export default function AnalyzePage() {
               <div 
                 key={song.id} 
                 onClick={() => handleSelectSong(song)}
-                className={`p-3 border rounded-md cursor-pointer transition-colors ${selectedSong?.id === song.id ? 'bg-accent border-accent' : 'bg-background border-border hover:border-accent'}`}
+                className={`p-3 border cursor-pointer transition-colors ${selectedSong?.id === song.id ? 'border-[var(--color-accent-analyze)] bg-[rgba(0,255,65,0.05)]' : 'border-border bg-background hover:border-[var(--color-accent-analyze)]'}`}
               >
-                <div className="font-bold text-primary">{song.title}</div>
+                <div className={`font-bold ${selectedSong?.id === song.id ? 'text-[var(--color-accent-analyze)]' : 'text-primary'}`}>{song.title}</div>
                 <div className="text-sm text-secondary">{song.artist}</div>
               </div>
             ))
@@ -180,9 +180,9 @@ export default function AnalyzePage() {
         <div className="p-4 border-t border-border">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-primary text-background py-2 rounded-md hover:opacity-90 transition-opacity font-bold"
+            className="w-full border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] py-2 hover:bg-[var(--color-accent-analyze)] hover:text-[#161616] transition-colors font-bold flex items-center justify-center gap-2"
           >
-            + 新規曲を登録
+            <Plus weight="bold" /> 新規曲を登録
           </button>
         </div>
       </div>
@@ -191,7 +191,7 @@ export default function AnalyzePage() {
       <div className="flex-1 bg-background flex flex-col overflow-y-auto relative">
         {!selectedSong ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
-            <ArrowLeftIcon className="w-6 h-6" /> 左から曲を選ぶか、新しく登録してね！
+            <ArrowLeft className="w-6 h-6" /> 左から曲を選ぶか、新しく登録してね！
           </div>
         ) : (
           <div className="p-8 max-w-4xl mx-auto w-full">
@@ -199,32 +199,32 @@ export default function AnalyzePage() {
             <div className="mb-8 border-b border-border pb-6">
               <h1 className="text-4xl font-bold mb-3 text-primary">{selectedSong.title}</h1>
               <div className="flex gap-3 text-sm text-secondary">
-                <span className="bg-surface px-3 py-1 rounded-full border border-border flex items-center gap-1"><MicIcon className="w-4 h-4" /> {selectedSong.artist}</span>
-                {selectedSong.bpm && <span className="bg-surface px-3 py-1 rounded-full border border-border">BPM: {selectedSong.bpm}</span>}
-                {selectedSong.key && <span className="bg-surface px-3 py-1 rounded-full border border-border">Key: {selectedSong.key}</span>}
+                <span className="bg-surface px-3 py-1 border border-border flex items-center gap-1"><MicrophoneStage className="w-4 h-4" /> {selectedSong.artist}</span>
+                {selectedSong.bpm && <span className="bg-surface px-3 py-1 border border-border">BPM: {selectedSong.bpm}</span>}
+                {selectedSong.key && <span className="bg-surface px-3 py-1 border border-border">Key: {selectedSong.key}</span>}
               </div>
             </div>
 
             {/* セクション群 */}
             <div className="space-y-6 pb-20">
               {sections.map(section => (
-                <div key={section.id} className={`border ${section.is_favorite ? 'border-primary shadow-sm' : 'border-border'} bg-surface rounded-lg p-6 transition-all`}>
+                <div key={section.id} className={`border ${section.is_favorite ? 'border-[var(--color-accent-analyze)]' : 'border-border'} bg-surface p-6 transition-all`}>
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-lg text-primary bg-background px-3 py-1 rounded border border-border inline-block">
+                    <h3 className="font-bold text-lg text-primary bg-background px-3 py-1 border border-border inline-block">
                       {section.section_name}
                     </h3>
                     <div className="space-x-2">
                       <button 
                         onClick={() => handleExtractPhrase(section)}
-                        className="flex items-center gap-1 text-xs bg-background border border-border px-3 py-1.5 rounded hover:bg-accent transition-colors text-primary font-bold"
+                        className="flex items-center gap-1 text-xs bg-background border border-border px-3 py-1.5 hover:border-[var(--color-accent-analyze)] hover:text-[var(--color-accent-analyze)] transition-colors text-primary font-bold"
                       >
-                        <EditIcon className="w-3 h-3" /> フレーズ抽出
+                        <HighlighterCircle className="w-4 h-4" /> フレーズ抽出
                       </button>
                       <button 
                         onClick={() => handleToggleFavorite(section.id, section.is_favorite)}
-                        className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded border transition-colors ${section.is_favorite ? 'bg-primary text-background border-primary font-bold' : 'bg-background border-border text-secondary hover:bg-accent'}`}
+                        className={`flex items-center gap-1 text-xs px-3 py-1.5 border transition-colors ${section.is_favorite ? 'bg-[var(--color-accent-analyze)] text-[#161616] border-[var(--color-accent-analyze)] font-bold' : 'bg-background border-border text-secondary hover:text-primary hover:border-border'}`}
                       >
-                        {section.is_favorite ? <><StarIcon className="w-3 h-3" /> お気に入り</> : <><StarOutlineIcon className="w-3 h-3" /> お気に入り</>}
+                        {section.is_favorite ? <><Star weight="fill" className="w-4 h-4" /> お気に入り</> : <><Star className="w-4 h-4" /> お気に入り</>}
                       </button>
                     </div>
                   </div>
@@ -236,10 +236,10 @@ export default function AnalyzePage() {
 
                   <div className="border-t border-border pt-4 mt-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <label className="flex items-center gap-1 text-xs text-secondary"><LightbulbIcon className="w-3 h-3" /> セクションメモ（考察・気付き）</label>
+                      <label className="flex items-center gap-1 text-xs text-secondary"><Lightbulb className="w-4 h-4" /> セクションメモ（考察・気付き）</label>
                     </div>
                     <textarea 
-                      className="w-full bg-background border border-border rounded p-3 text-sm text-primary focus:border-accent outline-none resize-none mb-3"
+                      className="w-full bg-background border border-border p-3 text-sm text-primary focus:border-[var(--color-accent-analyze)] outline-none resize-none mb-3"
                       rows={2}
                       placeholder="このセクションの展開がめっちゃエモい..."
                       value={section.memo || ''}
@@ -249,24 +249,24 @@ export default function AnalyzePage() {
                     {/* タグ付けUI */}
                     <div className="flex flex-wrap gap-2 items-center relative" onClick={(e) => e.stopPropagation()}>
                       {section.song_section_tags?.map((st: any) => (
-                        <span key={st.tags.id} className="group flex items-center text-xs bg-background border border-border text-secondary pl-2 pr-1 py-1 rounded transition-colors hover:border-accent">
+                        <span key={st.tags.id} className="group flex items-center text-xs bg-background border border-border text-secondary pl-2 pr-1 py-1 transition-colors">
                           {st.tags.name}
                           <button 
                             onClick={() => handleToggleSectionTag(section.id, st.tags.id, true)}
-                            className="ml-1 w-4 h-4 flex items-center justify-center rounded-full hover:bg-accent hover:text-primary"
+                            className="ml-1 w-4 h-4 flex items-center justify-center hover:text-primary"
                           >&times;</button>
                         </span>
                       ))}
                       <button 
                         onClick={() => setActiveDropdownId(activeDropdownId === section.id ? null : section.id)}
-                        className="text-xs text-secondary hover:text-primary px-2 py-1 transition-colors"
+                        className="text-xs text-secondary hover:text-primary px-2 py-1 transition-colors flex items-center gap-1"
                       >
-                        + タグを追加
+                        <Plus /> タグを追加
                       </button>
 
                       {/* タグ選択ドロップダウン */}
                       {activeDropdownId === section.id && (
-                        <div className="absolute top-full left-0 mt-2 w-64 bg-surface border border-border rounded-lg shadow-xl z-10 p-4 flex flex-col gap-4 max-h-[300px] overflow-y-auto">
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-surface border border-border z-10 p-4 flex flex-col gap-4 max-h-[300px] overflow-y-auto">
                           {['Focus', 'Gimmick', 'Context'].map(axis => {
                             const axisTags = allTags.filter(t => t.axis_category === axis);
                             if (axisTags.length === 0) return null;
@@ -280,7 +280,7 @@ export default function AnalyzePage() {
                                       <button
                                         key={tag.id}
                                         onClick={() => handleToggleSectionTag(section.id, tag.id, hasTag)}
-                                        className={`text-xs px-2.5 py-1.5 rounded-full border transition-colors ${hasTag ? 'bg-primary text-background border-primary' : 'bg-background text-secondary border-border hover:border-accent hover:text-primary'}`}
+                                        className={`text-xs px-2.5 py-1.5 border transition-colors ${hasTag ? 'bg-[var(--color-accent-analyze)] text-[#161616] border-[var(--color-accent-analyze)] font-bold' : 'bg-background text-secondary border-border hover:border-[var(--color-accent-analyze)] hover:text-primary'}`}
                                       >
                                         {tag.name}
                                       </button>
