@@ -14,7 +14,7 @@ export default function Navigation() {
 
   return (
     <nav className="w-full h-full bg-surface flex flex-col py-6 px-4">
-      <div className="font-bold text-2xl mb-12 text-primary tracking-wider overflow-hidden whitespace-nowrap text-ellipsis">RE:ME</div>
+      <div className="font-bold text-2xl mb-12 text-primary tracking-wider overflow-hidden whitespace-nowrap text-ellipsis">Atelier</div>
       
       <ul className="space-y-2 flex-1">
         {navItems.map((item) => {

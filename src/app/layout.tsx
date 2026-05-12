@@ -10,7 +10,7 @@ const kleeOne = Klee_One({
 });
 
 export const metadata: Metadata = {
-  title: "ReMe",
+  title: "Atelier",
   description: "A tool for lyricists",
 };
 

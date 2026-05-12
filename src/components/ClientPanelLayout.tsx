@@ -4,7 +4,7 @@ import Navigation from '@/components/Navigation';
 
 export default function ClientPanelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Group orientation="horizontal" className="h-full w-full overflow-hidden flex">
+    <Group orientation="horizontal" className="h-full w-full overflow-hidden">
       {/* Navigation Panel */}
       <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col h-full bg-surface border-r border-border">
         <Navigation />

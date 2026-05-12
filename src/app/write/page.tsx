@@ -117,7 +117,7 @@ export default function WritePage() {
   };
 
   return (
-    <div className="flex h-full w-full bg-background relative overflow-hidden">
+    <div className="h-full w-full bg-background relative overflow-hidden">
       <Group orientation="horizontal" className="h-full w-full">
         {/* 左ペイン: ドラフト一覧 */}
         <Panel defaultSize={20} minSize={15} maxSize={40} className="bg-surface flex flex-col h-full border-r border-border relative">

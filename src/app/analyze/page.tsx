@@ -147,7 +147,7 @@ export default function AnalyzePage() {
   };
 
   return (
-    <div className="flex h-full w-full" onClick={() => setActiveDropdownId(null)}>
+    <div className="h-full w-full" onClick={() => setActiveDropdownId(null)}>
       <Group orientation="horizontal" className="h-full w-full">
         {/* 左ペイン (30%) */}
         <Panel defaultSize={30} minSize={20} maxSize={50} className="bg-surface flex flex-col h-full border-r border-border relative">
