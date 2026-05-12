@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  /* ReMe Design System - Matte Dark */
-  --background: #161616;
-  --surface: #222222;
-  --text-primary: #E6E6E6;
-  --text-secondary: #888888;
-  --border: #333333;
-  --accent: #FFFFFF;
+  /* Warm Dark & Soft Colors */
+  --background: #1c1917;
+  --surface: #292524;
+  --border: #44403c;
+  --text-primary: #e7e5e4;
+  --text-secondary: #a8a29e;
+  --accent: #d6d3d1;
   
-  --accent-analyze: #00FF41;
-  --accent-stock: #FF5E00;
-  --accent-write: #00E5FF;
+  --accent-analyze: #86efac;
+  --accent-stock: #fdba74;
+  --accent-write: #93c5fd;
 }
 
 @theme inline {
@@ -24,11 +24,11 @@
   --color-accent-analyze: var(--accent-analyze);
   --color-accent-stock: var(--accent-stock);
   --color-accent-write: var(--accent-write);
-  --font-sans: var(--font-zen-kaku), sans-serif;
+  --font-sans: var(--font-klee), sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--text-primary);
-  font-family: var(--font-zen-kaku), sans-serif;
+  font-family: var(--font-klee), sans-serif;
 }

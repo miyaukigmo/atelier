@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import AddSongModal from '@/components/AddSongModal';
 import { ArrowLeft, MicrophoneStage, HighlighterCircle, Lightbulb, Star, Plus } from '@phosphor-icons/react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 export default function AnalyzePage() {
   const [songs, setSongs] = useState<any[]>([]);
@@ -147,8 +148,9 @@ export default function AnalyzePage() {
 
   return (
     <div className="flex h-full w-full" onClick={() => setActiveDropdownId(null)}>
-      {/* 左ペイン (30%) */}
-      <div className="w-[30%] min-w-[250px] border-r border-border bg-surface flex flex-col shrink-0">
+      <PanelGroup direction="horizontal" className="h-full w-full">
+        {/* 左ペイン (30%) */}
+        <Panel defaultSize={30} minSize={20} maxSize={50} className="bg-surface flex flex-col h-full border-r border-border relative">
         <div className="p-4 border-b border-border">
           <input 
             type="text" 
@@ -180,15 +182,18 @@ export default function AnalyzePage() {
         <div className="p-4 border-t border-border">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-full border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] py-2 hover:bg-[var(--color-accent-analyze)] hover:text-[#161616] transition-colors font-bold flex items-center justify-center gap-2"
+            className="w-full border border-[var(--color-accent-analyze)] text-[var(--color-accent-analyze)] py-2 hover:bg-[var(--color-accent-analyze)] hover:text-[#1c1917] transition-colors font-bold flex items-center justify-center gap-2"
           >
             <Plus weight="bold" /> 新規曲を登録
           </button>
         </div>
-      </div>
+      </Panel>
+
+      <PanelResizeHandle className="w-1 bg-border hover:bg-[var(--color-accent-analyze)] transition-colors cursor-col-resize z-10 shrink-0" />
 
       {/* 右ペイン (70%) */}
-      <div className="flex-1 bg-background flex flex-col overflow-y-auto relative">
+      <Panel defaultSize={70} minSize={50} className="bg-background flex flex-col h-full relative">
+        <div className="flex-1 overflow-y-auto flex flex-col h-full">
         {!selectedSong ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
             <ArrowLeft className="w-6 h-6" /> 左から曲を選ぶか、新しく登録してね！
@@ -300,7 +305,9 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </Panel>
+      </PanelGroup>
 
       <AddSongModal 
         isOpen={isModalOpen} 

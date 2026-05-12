@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Zen_Kaku_Gothic_New } from "next/font/google";
+import { Klee_One } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import ClientPanelLayout from "@/components/ClientPanelLayout";
 
-const zenKakuGothicNew = Zen_Kaku_Gothic_New({
-  variable: "--font-zen-kaku",
+const kleeOne = Klee_One({
+  variable: "--font-klee",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "600"],
 });
 
 export const metadata: Metadata = {
@@ -21,12 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${zenKakuGothicNew.variable} bg-background text-primary font-sans antialiased h-screen w-screen overflow-hidden flex`}>
-        <Navigation />
-        {/* Main Content Area */}
-        <main className="flex-1 h-full overflow-y-auto bg-background">
+      <body className={`${kleeOne.variable} bg-background text-primary font-sans antialiased h-screen w-screen overflow-hidden`}>
+        <ClientPanelLayout>
           {children}
-        </main>
+        </ClientPanelLayout>
       </body>
     </html>
   );

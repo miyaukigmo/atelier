@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import StockPalette from '@/components/StockPalette';
 import { Pen, ArrowLeft, Lightbulb, ChatCircle, Trash, CaretUp, CaretDown, Plus } from '@phosphor-icons/react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 export default function WritePage() {
   const [drafts, setDrafts] = useState<any[]>([]);
@@ -117,8 +118,9 @@ export default function WritePage() {
 
   return (
     <div className="flex h-full w-full bg-background relative overflow-hidden">
-      {/* 左ペイン: ドラフト一覧 */}
-      <div className="w-[20%] min-w-[200px] border-r border-border bg-surface flex flex-col shrink-0">
+      <PanelGroup direction="horizontal" className="h-full w-full">
+        {/* 左ペイン: ドラフト一覧 */}
+        <Panel defaultSize={20} minSize={15} maxSize={40} className="bg-surface flex flex-col h-full border-r border-border relative">
         <div className="p-4 border-b border-border font-bold text-primary flex justify-between items-center">
           <span className="flex items-center gap-2"><Pen className="w-4 h-4" /> 制作中の曲</span>
           <button onClick={handleCreateDraft} className="text-secondary hover:text-[var(--color-accent-write)] px-2 border border-transparent hover:border-[var(--color-accent-write)] transition-colors"><Plus /></button>
@@ -141,10 +143,13 @@ export default function WritePage() {
             </div>
           ))}
         </div>
-      </div>
+      </Panel>
+
+      <PanelResizeHandle className="w-1 bg-border hover:bg-[var(--color-accent-write)] transition-colors cursor-col-resize z-10 shrink-0" />
 
       {/* 右ペイン: エディタ */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <Panel defaultSize={80} minSize={50} className="flex flex-col h-full relative">
+        <div className="flex-1 overflow-y-auto flex flex-col h-full">
         {!activeDraft ? (
           <div className="flex-1 flex items-center justify-center gap-2 text-secondary text-lg">
             <ArrowLeft className="w-6 h-6" /> 左からドラフトを選ぶか、新しく作ってね！
@@ -240,7 +245,9 @@ export default function WritePage() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </Panel>
+      </PanelGroup>
 
       {/* 右からスライドインするStockパレット */}
       <StockPalette isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />
