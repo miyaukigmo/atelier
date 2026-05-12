@@ -10,21 +10,31 @@ export default function AnalyzePage() {
   const [sections, setSections] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Tag management
+  const [allTags, setAllTags] = useState<any[]>([]);
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
   const fetchSongs = async () => {
     const { data } = await supabase.from('songs').select('*').order('created_at', { ascending: false });
     if (data) setSongs(data);
   };
 
+  const fetchAllTags = async () => {
+    const { data } = await supabase.from('tags').select('*').order('name', { ascending: true });
+    if (data) setAllTags(data);
+  };
+
   useEffect(() => {
     fetchSongs();
+    fetchAllTags();
   }, []);
 
   const handleSelectSong = async (song: any) => {
     setSelectedSong(song);
-    // Fetch sections with their highlights
+    // Fetch sections with their highlights and tags
     const { data } = await supabase
       .from('song_sections')
-      .select('*, phrase_highlights(*)')
+      .select('*, phrase_highlights(*), song_section_tags(tags(*))')
       .eq('song_id', song.id)
       .order('sort_order', { ascending: true });
     
@@ -40,6 +50,28 @@ export default function AnalyzePage() {
     const newFav = !currentFav;
     setSections(sections.map(s => s.id === sectionId ? { ...s, is_favorite: newFav } : s));
     await supabase.from('song_sections').update({ is_favorite: newFav }).eq('id', sectionId);
+  };
+
+  const handleToggleSectionTag = async (sectionId: string, tagId: string, hasTag: boolean) => {
+    if (hasTag) {
+      await supabase.from('song_section_tags').delete().match({ section_id: sectionId, tag_id: tagId });
+    } else {
+      await supabase.from('song_section_tags').insert([{ section_id: sectionId, tag_id: tagId }]);
+    }
+    
+    // UIステートの更新
+    setSections(sections.map(s => {
+      if (s.id === sectionId) {
+        const currentTags = s.song_section_tags || [];
+        if (hasTag) {
+          return { ...s, song_section_tags: currentTags.filter((st: any) => st.tags.id !== tagId) };
+        } else {
+          const tagToAdd = allTags.find(t => t.id === tagId);
+          return { ...s, song_section_tags: [...currentTags, { tags: tagToAdd }] };
+        }
+      }
+      return s;
+    }));
   };
 
   const handleExtractPhrase = async (section: any) => {
@@ -113,7 +145,7 @@ export default function AnalyzePage() {
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full" onClick={() => setActiveDropdownId(null)}>
       {/* 左ペイン (30%) */}
       <div className="w-[30%] min-w-[250px] border-r border-border bg-surface flex flex-col shrink-0">
         <div className="p-4 border-b border-border">
@@ -196,15 +228,66 @@ export default function AnalyzePage() {
                     {renderHighlightedText(section.content, section.phrase_highlights)}
                   </div>
 
-                  <div className="border-t border-border pt-4">
-                    <label className="flex items-center gap-1 text-xs text-secondary mb-2"><LightbulbIcon className="w-3 h-3" /> セクションメモ（考察・気付き）</label>
+                  <div className="border-t border-border pt-4 mt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <label className="flex items-center gap-1 text-xs text-secondary"><LightbulbIcon className="w-3 h-3" /> セクションメモ（考察・気付き）</label>
+                    </div>
                     <textarea 
-                      className="w-full bg-background border border-border rounded p-3 text-sm text-primary focus:border-accent outline-none resize-none"
+                      className="w-full bg-background border border-border rounded p-3 text-sm text-primary focus:border-accent outline-none resize-none mb-3"
                       rows={2}
                       placeholder="このセクションの展開がめっちゃエモい..."
                       value={section.memo || ''}
                       onChange={(e) => handleUpdateMemo(section.id, e.target.value)}
                     />
+                    
+                    {/* タグ付けUI */}
+                    <div className="flex flex-wrap gap-2 items-center relative" onClick={(e) => e.stopPropagation()}>
+                      {section.song_section_tags?.map((st: any) => (
+                        <span key={st.tags.id} className="group flex items-center text-xs bg-background border border-border text-secondary pl-2 pr-1 py-1 rounded transition-colors hover:border-accent">
+                          {st.tags.name}
+                          <button 
+                            onClick={() => handleToggleSectionTag(section.id, st.tags.id, true)}
+                            className="ml-1 w-4 h-4 flex items-center justify-center rounded-full hover:bg-accent hover:text-primary"
+                          >&times;</button>
+                        </span>
+                      ))}
+                      <button 
+                        onClick={() => setActiveDropdownId(activeDropdownId === section.id ? null : section.id)}
+                        className="text-xs text-secondary hover:text-primary px-2 py-1 transition-colors"
+                      >
+                        + タグを追加
+                      </button>
+
+                      {/* タグ選択ドロップダウン */}
+                      {activeDropdownId === section.id && (
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-surface border border-border rounded-lg shadow-xl z-10 p-4 flex flex-col gap-4 max-h-[300px] overflow-y-auto">
+                          {['Focus', 'Gimmick', 'Context'].map(axis => {
+                            const axisTags = allTags.filter(t => t.axis_category === axis);
+                            if (axisTags.length === 0) return null;
+                            return (
+                              <div key={axis}>
+                                <div className="text-[10px] uppercase font-bold text-secondary mb-2 tracking-wider">{axis}</div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {axisTags.map(tag => {
+                                    const hasTag = section.song_section_tags?.some((st: any) => st.tags.id === tag.id);
+                                    return (
+                                      <button
+                                        key={tag.id}
+                                        onClick={() => handleToggleSectionTag(section.id, tag.id, hasTag)}
+                                        className={`text-xs px-2.5 py-1.5 rounded-full border transition-colors ${hasTag ? 'bg-primary text-background border-primary' : 'bg-background text-secondary border-border hover:border-accent hover:text-primary'}`}
+                                      >
+                                        {tag.name}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ))}
