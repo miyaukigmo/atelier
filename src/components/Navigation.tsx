@@ -1,12 +1,13 @@
 'use client';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChartLineUp, Database, PencilSimple, Gear } from '@phosphor-icons/react';
+import { ChartLineUp, Database, PencilSimple, Gear, Link as LinkIcon } from '@phosphor-icons/react';
 
 const navItems = [
   { name: 'Analyze', href: '/analyze', icon: ChartLineUp },
   { name: 'Stock', href: '/stock', icon: Database },
   { name: 'Write', href: '/write', icon: PencilSimple },
+  { name: 'URL', href: '/urls', icon: LinkIcon },
 ];
 
 export default function Navigation() {
@@ -24,26 +25,26 @@ export default function Navigation() {
             const Icon = item.icon;
             return (
               <li key={item.name}>
-                <Link
+                <NextLink
                   href={item.href}
                   className={`flex items-center gap-3 p-3 transition-colors ${isActive ? 'bg-primary text-background font-bold' : 'text-secondary hover:text-primary'}`}
                 >
                   <Icon weight={isActive ? 'fill' : 'duotone'} className="w-5 h-5 shrink-0" />
                   <span className="truncate whitespace-nowrap">{item.name}</span>
-                </Link>
+                </NextLink>
               </li>
             );
           })}
         </ul>
 
         <div className="mt-auto border-t border-border pt-4">
-          <Link
+          <NextLink
             href="/settings"
             className={`flex items-center gap-3 p-3 transition-colors ${pathname?.startsWith('/settings') ? 'bg-primary text-background font-bold' : 'text-secondary hover:text-primary'}`}
           >
             <Gear weight={pathname?.startsWith('/settings') ? 'fill' : 'duotone'} className="w-5 h-5 shrink-0" />
             <span className="truncate whitespace-nowrap">Settings</span>
-          </Link>
+          </NextLink>
         </div>
       </nav>
 
@@ -53,23 +54,23 @@ export default function Navigation() {
           const isActive = pathname?.startsWith(item.href);
           const Icon = item.icon;
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-colors ${isActive ? 'text-primary border-t-2 border-primary' : 'text-secondary'}`}
-            >
-              <Icon weight={isActive ? 'fill' : 'regular'} className="w-5 h-5" />
-              {item.name}
-            </Link>
-          );
+          <NextLink
+            key={item.name}
+            href={item.href}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-colors ${isActive ? 'text-primary border-t-2 border-primary' : 'text-secondary'}`}
+          >
+            <Icon weight={isActive ? 'fill' : 'regular'} className="w-5 h-5" />
+            {item.name}
+          </NextLink>
+        );
         })}
-        <Link
+        <NextLink
           href="/settings"
           className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-colors ${pathname?.startsWith('/settings') ? 'text-primary border-t-2 border-primary' : 'text-secondary'}`}
         >
           <Gear weight={pathname?.startsWith('/settings') ? 'fill' : 'regular'} className="w-5 h-5" />
           Settings
-        </Link>
+        </NextLink>
       </nav>
     </>
   );
