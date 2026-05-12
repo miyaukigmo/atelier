@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import StockPalette from '@/components/StockPalette';
-import { EditIcon, ArrowLeftIcon, LightbulbIcon, MessageIcon } from '@/components/icons';
+import { EditIcon, ArrowLeftIcon, LightbulbIcon, MessageIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
 
 export default function WritePage() {
   const [drafts, setDrafts] = useState<any[]>([]);
@@ -37,6 +37,18 @@ export default function WritePage() {
     }
   };
 
+  const handleDeleteDraft = async (draftId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('このドラフトを本当に削除する？（元には戻せないよ！）')) return;
+    
+    await supabase.from('drafts').delete().eq('id', draftId);
+    setDrafts(drafts.filter(d => d.id !== draftId));
+    if (activeDraft?.id === draftId) {
+      setActiveDraft(null);
+      setSections([]);
+    }
+  };
+
   const handleSelectDraft = async (draft: any) => {
     setActiveDraft(draft);
     const { data } = await supabase.from('draft_sections').select('*').eq('draft_id', draft.id).order('sort_order', { ascending: true });
@@ -51,7 +63,7 @@ export default function WritePage() {
 
   const handleAddSection = async () => {
     if (!activeDraft) return;
-    const newOrder = sections.length;
+    const newOrder = sections.length > 0 ? Math.max(...sections.map(s => s.sort_order || 0)) + 1 : 0;
     const { data } = await supabase.from('draft_sections').insert([{
       draft_id: activeDraft.id,
       section_name: '新しいセクション',
@@ -60,12 +72,47 @@ export default function WritePage() {
       sub_content: ''
     }]).select().single();
     
-    if (data) setSections([...sections, data]);
+    if (data) {
+      setSections([...sections, data]);
+    }
   };
 
   const handleUpdateSection = async (id: string, field: string, value: string) => {
     setSections(sections.map(s => s.id === id ? { ...s, [field]: value } : s));
     await supabase.from('draft_sections').update({ [field]: value }).eq('id', id);
+  };
+
+  const handleDeleteSection = async (id: string) => {
+    if (!window.confirm('このセクションを削除してもいい？')) return;
+    await supabase.from('draft_sections').delete().eq('id', id);
+    setSections(sections.filter(s => s.id !== id));
+  };
+
+  const handleMoveSection = async (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === sections.length - 1) return;
+
+    const newSections = [...sections];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    // スワップ
+    const currentSection = newSections[index];
+    const targetSection = newSections[targetIndex];
+    
+    const currentOrder = currentSection.sort_order;
+    currentSection.sort_order = targetSection.sort_order;
+    targetSection.sort_order = currentOrder;
+
+    newSections[index] = targetSection;
+    newSections[targetIndex] = currentSection;
+
+    setSections(newSections);
+
+    // DB更新 (並列処理)
+    await Promise.all([
+      supabase.from('draft_sections').update({ sort_order: currentSection.sort_order }).eq('id', currentSection.id),
+      supabase.from('draft_sections').update({ sort_order: targetSection.sort_order }).eq('id', targetSection.id)
+    ]);
   };
 
   return (
@@ -81,9 +128,16 @@ export default function WritePage() {
             <div 
               key={draft.id} 
               onClick={() => handleSelectDraft(draft)}
-              className={`p-3 border rounded-md cursor-pointer transition-colors text-sm ${activeDraft?.id === draft.id ? 'bg-accent border-accent text-primary' : 'bg-background border-border text-secondary hover:border-accent'}`}
+              className={`p-3 border rounded-md cursor-pointer transition-colors text-sm flex justify-between items-center group ${activeDraft?.id === draft.id ? 'bg-accent border-accent text-primary' : 'bg-background border-border text-secondary hover:border-accent'}`}
             >
-              {draft.title}
+              <span className="truncate pr-2">{draft.title}</span>
+              <button 
+                onClick={(e) => handleDeleteDraft(draft.id, e)}
+                className={`text-secondary hover:text-primary transition-opacity ${activeDraft?.id === draft.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                title="削除"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
@@ -116,9 +170,32 @@ export default function WritePage() {
 
             {/* セクション群 */}
             <div className="space-y-8">
-              {sections.map(section => (
-                <div key={section.id} className="bg-surface border border-border rounded-lg p-6 shadow-sm">
-                  <div className="mb-4">
+              {sections.map((section, index) => (
+                <div key={section.id} className="bg-surface border border-border rounded-lg p-6 shadow-sm relative group">
+                  
+                  {/* アクションボタン (右上) */}
+                  <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-surface pl-2">
+                    <button 
+                      onClick={() => handleMoveSection(index, 'up')}
+                      disabled={index === 0}
+                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                      title="上に移動"
+                    ><ArrowUpIcon className="w-4 h-4" /></button>
+                    <button 
+                      onClick={() => handleMoveSection(index, 'down')}
+                      disabled={index === sections.length - 1}
+                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                      title="下に移動"
+                    ><ArrowDownIcon className="w-4 h-4" /></button>
+                    <div className="w-px h-4 bg-border mx-1"></div>
+                    <button 
+                      onClick={() => handleDeleteSection(section.id)}
+                      className="p-1.5 text-secondary hover:text-primary hover:bg-accent rounded"
+                      title="セクションを削除"
+                    ><TrashIcon className="w-4 h-4" /></button>
+                  </div>
+
+                  <div className="mb-4 pr-32">
                     <input 
                       type="text" 
                       value={section.section_name}
