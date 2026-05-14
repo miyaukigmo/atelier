@@ -1,10 +1,11 @@
 'use client';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChartLineUp, Database, PencilSimple, Gear, Link as LinkIcon } from '@phosphor-icons/react';
+import { ChartLineUp, Database, PencilSimple, Gear, Link as LinkIcon, Lightbulb } from '@phosphor-icons/react';
 
 const navItems = [
   { name: 'Analyze', href: '/analyze', icon: ChartLineUp },
+  { name: 'Technic', href: '/technic', icon: Lightbulb },
   { name: 'Stock', href: '/stock', icon: Database },
   { name: 'Write', href: '/write', icon: PencilSimple },
   { name: 'URL', href: '/urls', icon: LinkIcon },

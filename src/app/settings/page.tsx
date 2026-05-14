@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
-import { Gear, Tag, X } from '@phosphor-icons/react';
+import { Gear, Tag, X, Copy, Check, Lightbulb } from '@phosphor-icons/react';
 
 const INITIAL_TAGS = [
   { axis_category: 'Focus', name: '情景' },
@@ -26,6 +26,57 @@ export default function SettingsPage() {
     Gimmick: '',
     Context: ''
   });
+  const [copied, setCopied] = useState(false);
+
+  const PROMPT_TEMPLATE = `あなたはプロの作詞家です。提示された歌詞から、クリエイター（作詞家志望）が自身の制作に「即座に活かせる思考プロセス」を抽出するための分析を行ってください。
+会話のトーンは女子高生っぽいカジュアルさで、但し分析内容はプロの深さを保ってください。単なる感想や賞賛は不要です。
+私（ユーザー）からの歌詞提示後の最初の出力は以下のフォーマットに厳密に従ってください。
+
+《出力ルール》
+- 単なる感想や賞賛は一切排除し、客観的・分析的な事実のみを述べること。
+- 一文は短く分かりやすい文章を心掌けること。
+- マークダウン（見出し、太字、箇条書き、表）を駆使し、視認性の高いレイアウトにすること。
+- 「なぜそれが優れているのか」「どうすれば自作に応用できるか」という視点を常に持つこと。
+
+《セクション定義（J-POP基準）》
+- 数字（1, 2など）：番
+- A：Aメロ
+- B：Bメロ
+- C：サビ
+- D：Dメロ（A、B、サビ以外の、そこでしか登場しないメロディ）
+- OC：落ちサビ（楽器編成が減るなど、静かなサビ）
+- LC：ラストサビ（楽曲の最終的なサビ）
+
+《分析ステップ》
+
+## 1. コア・コンセプトとモチーフ（表形式）
+
+| 分析項目 | 抽出結果 |
+|------|------|
+| 初期衝動（1行） | 作者の出発点となった中核の感情・メッセージ |
+| メインモチーフ | 感情を托した具体的なモノ・事象 |
+| サブモチーフ | メインを補強する関連語彙 |
+
+## 2. 語彙パレットと世界観の構築
+
+象徴的な単語をカテゴリに分けて抽出。
+
+## 3. 情報開示のタイムライン（セクション別解剖）
+
+最初のセクションから最後のセクションまで、流れに沿って分析。
+
+## 4. 特筆すべき作詞技法・表現のメカニズム
+
+優れたレトリックを複数抽出。
+
+## 5. クリエイター向け「実践アクションプラン」
+
+この歌詞から盗むべき作詞テクニックを「抽象化・汎用化」して提示してください。
+
+## 作詞テクニック
+**テクニック名**：具体的な説明（1行）
+**テクニック名**：具体的な説明（1行）
+**テクニック名**：具体的な説明（1行）`;
 
   const fetchTags = async () => {
     const { data } = await supabase.from('tags').select('*').order('name', { ascending: true });
@@ -146,6 +197,33 @@ export default function SettingsPage() {
             </div>
           </div>
           
+          <div>
+            <h2 className="text-2xl font-bold text-primary mb-2 flex items-center gap-2">
+              <Lightbulb weight="duotone" className="w-6 h-6" /> Gemini プロンプトテンプレート
+            </h2>
+            <p className="text-secondary mb-6">Geminiに歌詞分析を依頼するときのシステムプロンプトです。コピーしてGeminiに貧り付けて使ってね！</p>
+            <div className="bg-surface border border-border">
+              <div className="px-4 py-3 border-b border-border flex justify-between items-center">
+                <span className="text-xs text-secondary font-bold tracking-wider uppercase">システムプロンプト</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(PROMPT_TEMPLATE);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border transition-colors ${
+                    copied
+                      ? 'bg-[var(--color-accent-analyze)] text-[#1c1917] border-[var(--color-accent-analyze)] font-bold'
+                      : 'border-border text-secondary hover:text-primary hover:border-primary'
+                  }`}
+                >
+                  {copied ? <><Check className="w-3.5 h-3.5" /> コピー完了！</> : <><Copy className="w-3.5 h-3.5" /> コピー</>}
+                </button>
+              </div>
+              <pre className="p-4 text-xs text-secondary overflow-x-auto leading-relaxed whitespace-pre-wrap max-h-64 overflow-y-auto">{PROMPT_TEMPLATE}</pre>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
